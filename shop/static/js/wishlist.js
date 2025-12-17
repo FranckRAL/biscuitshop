@@ -8,14 +8,13 @@ $(document).ready(function() {
             function(response) {
                 if (response.success) {
                     $('#cart-count').text(response.cart_count);
-                    alert('Product added to cart!');
+                    displayMessage(response.message, 'success');
                 } else {
-                    alert('Error: ' + (response.error || 'Unknown error'));
+                    displayMessage(response.error || 'Unknown error', 'error');
                 }
             },
             function(xhr, status, error) {
-                console.error('Add to cart error:', error);
-                alert('Error adding product to cart: ' + error);
+                displayMessage('Error adding product to cart: ' + error, status);
             }
         );
     });
@@ -42,11 +41,13 @@ $(document).ready(function() {
                     } else {
                         $('#wishlist-count').remove();
                     }
+                    displayMessage(response.message, 'success');
+                } else {
+                    displayMessage(response.error, 'error');
                 }
             },
             function(xhr, status, error) {
-                console.error('Toggle favorite error:', error);
-                alert('Error updating wishlist: ' + error);
+                displayMessage('Error updating wishlist: ' + error, status);
             }
         );
     });

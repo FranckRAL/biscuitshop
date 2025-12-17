@@ -1,0 +1,65 @@
+{% extends "shop/main.html" %}
+{% load static %}
+
+{% block title %}Your Shopping Cart{% endblock title %}
+
+{% block content %}
+<h1 class="text-2xl font-bold mb-4">Your Shopping Cart</h1>
+
+{% if cart_items %}
+    <table class="min-w-full bg-white border border-gray-300">
+        <thead>
+            <tr>
+                <th class="py-2 px-4 border-b border-gray-300 text-left">Product</th>
+                <th class="py-2 px-4 border-b border-gray-300 text-left">Quantity</th>
+                <th class="py-2 px-4 border-b border-gray-300 text-left">Price</th>
+                <th class="py-2 px-4 border-b border-gray-300 text-left">Total</th>
+                <th class="py-2 px-4 border-b border-gray-300 text-left">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td class="py-2 px-4 border-b border-gray-300">{{ item.product.name }}</td>
+                <td class="py-2 px-4 border-b border-gray-300" >{{ item.quantity }}</td>
+                <td class="py-2 px-4 border-b border-gray-300">${{ item.product.price }}</td>
+                <td class="py-2 px-4 border-b border-gray-300">${{ item.subtotal }}</td>
+                <td class="py-2 px-4 border-b border-gray-300 flex space-x-5">
+                    <div class="flex space-x-2">
+                        <button 
+                        class=" increase-cart-btn cursor-pointer bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                        data-url="{% url 'add-to-cart' item.product.id %}"
+                            >
+                            <i class="bi bi-plus"></i>
+                        </button>
+                        <button 
+                        class="decrease-cart-btn cursor-pointer bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600"
+                        data-url="{% url 'substract-from-cart' item.product.id %}"
+                            >
+                            <i class="bi bi-dash"></i>
+                        </button>
+                    </div>
+                    <button 
+                    class="remove-cart-btn cursor-pointer bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                    data-url="{% url 'remove-from-cart' item.product.id %}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>   
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <p class="text-right font-bold mt-4">Total: ${{ cart.get_total_price }}</p>
+{% else %}
+    <div class="flex justify-center items-center text-gray-600 w-full mt-10 ">
+        <p class="text-lg">Your cart is empty.</p>
+        <a href="{% url 'product-list' %}" class="text-blue-600 hover:underline ml-2">Browse products</a>
+    </div>
+{% endif %}
+
+{% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'js/utils.js'%}"></script>
+    <script src="{% static 'js/cart.js' %}"></script>
+{% endblock extra_js %}

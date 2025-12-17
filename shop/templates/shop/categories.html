@@ -1,0 +1,27 @@
+{% if categories %}
+    <div>
+        <form>
+            <label for="category" class="block mb-2 text-sm font-medium text-gray-700">Filter by Category:</label>
+            <select id="category" name="category" class="border border-gray-300 rounded p-2">
+                <option value="">All Categories</option>
+                {% for category in categories %}
+                    <option value="{{ category.id }}">{{ category.name }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+    <script type='text/javascript'>
+        $('#category').on('change', function() {
+            var selectedCategory = $(this).val();
+            window.location.href = selectedCategory ? '?category=' + selectedCategory : window.location.pathname;
+        });
+        {% if current_category %}
+        $('#category').val('{{ current_category }}');
+        {% endif %}
+    </script>
+{% else %}
+    <p class="text-gray-600">No categories available.</p>
+
+
+
+{% endif %}

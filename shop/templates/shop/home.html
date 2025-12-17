@@ -1,0 +1,21 @@
+{% extends "shop/main.html" %}
+{% load static %}
+
+{% block title %}Home - Biscuit Shop{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto p-4 h-screen grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+        <div class="text-center">
+            <h2 class="text-3xl font-bold mb-4">Welcome to Biscuit'tsika!</h2>
+            <p class="mb-4 text-gray-700">Your one-stop shop for delicious biscuits and treats.</p>
+            <a href="{% url 'product-list' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Browse Products</a>
+        </div>
+        <div>
+            <img src="{% static 'images/biscuit1.jpg' %}" alt="Delicious Biscuits" class="mx-auto rounded-lg shadow-lg" loading="lazy">
+        </div>
+    </div>
+
+{% endblock %}
+{% block extra_js %}
+    <script src="{% static 'js/utils.js' %}"></script>
+{% endblock extra_js %}

@@ -1,0 +1,7 @@
+<div class="container mx-auto mt-4">
+        <div id="alert" 
+            class="alert p-3 rounded mb-2 {% if message.tags %}{{ message.tags }}{% endif %}{% if message.tags == 'error' %}bg-[#fee] text-[#c33]{% elif message.tags == 'success' %} bg-[#efe] text-[#3c3] {% else %} bg-[#eef] text-[#33c] {% endif %}"
+            role="alert">
+            {{ message }}
+        </div>
+</div>

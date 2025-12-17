@@ -10,12 +10,13 @@ $(document).ready(function() {
             function(response) {
                 if (response.success) {
                     location.reload();
+                    displayMessage(response.message, 'success');
                 } else {
-                    alert('Error: ' + response.error);
+                    displayMessage(response.message, 'error');
                 }
             },
             function() {
-                alert('Error updating cart.');
+                displayMessage('Error updating cart.', 'error');
             }
         );
     });
@@ -29,12 +30,13 @@ $(document).ready(function() {
             function(response) {
                 if (response.success) {
                     location.reload();
+                    displayMessage(response.message, 'success');
                 } else {
-                    alert('Error: ' + response.error);
+                    displayMessage(response.message, 'error');
                 }
             },
             function() {
-                alert('Error updating cart.');
+                displayMessage('Error updating cart.', 'error');
             }
         );
     });
@@ -48,12 +50,13 @@ $(document).ready(function() {
             function(response) {
                 if (response.success) {
                     location.reload();
+                    displayMessage(response.message, 'success');
                 } else {
-                    alert('Error: ' + response.error);
+                    displayMessage(response.error, 'error')
                 }
             },
             function() {
-                alert('Error removing item from cart.');
+                displayMessage('Error updating cart.', 'error');
             }
         );
     });

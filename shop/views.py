@@ -167,6 +167,7 @@ def add_to_cart(request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
+                'message': f'{product.name} added to cart!',
                 'cart_count': cart.__len__(),
                 'cart_total_price': float(cart.get_total_price())
             })
@@ -176,7 +177,6 @@ def add_to_cart(request, product_id):
     except Product.DoesNotExist:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
-        messages.error(request, 'Product not found.')
         return redirect('product-list')
     
     except Exception as e:
@@ -190,17 +190,17 @@ def remove_from_cart(request, product_id):
     try:
         cart = request.cart
         cart.remove_item(product_id)
-        messages.success(request, 'Product removed from cart.')
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
+                'message': 'Product removed from cart.',
                 'cart_count': cart.__len__(),
                 'cart_total_price': float(cart.get_total_price())
             })
             
     except Exception as e:
-        messages.error(request, f'Error removing product: {str(e)}')
+        pass
     return redirect('cart')
 
 def substract_item_qty_from_cart(request, product_id):
@@ -208,17 +208,17 @@ def substract_item_qty_from_cart(request, product_id):
     try:
         cart = request.cart
         cart.substract_number_of_item(product_id)
-        messages.success(request, 'Product quantity decreased.')
         
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
+                'message': 'Product quantity decreased.',
                 'cart_count': cart.__len__(),
                 'cart_total_price': float(cart.get_total_price())
             })
             
     except Exception as e:
-        messages.error(request, f'Error updating quantity: {str(e)}')
+        pass
     return redirect('cart')
 
 
@@ -255,11 +255,11 @@ def toggle_favorite(request, product_id):
         if is_favorited:
             wishlist.remove(product_id)
             was_added = False
-            messages.info(request, f'{product.name} removed from wishlist.')
+            message = f'{product.name} removed from wishlist.'
         else:
             wishlist.add(product_id)
             was_added = True
-            messages.success(request, f'{product.name} added to wishlist.')
+            message = f'{product.name} added to wishlist.'
         
         # Check for AJAX request and return JSON
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -267,6 +267,7 @@ def toggle_favorite(request, product_id):
                 'success': True,
                 'is_favorited': was_added,      # True if just added, False if just removed
                 'wishlist_count': wishlist.__len__(),
+                'message': message
             })
         
         # Non-AJAX fallback: redirect to referrer
@@ -275,10 +276,8 @@ def toggle_favorite(request, product_id):
     except Product.DoesNotExist:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
-        messages.error(request, 'Product not found.')
         return redirect('product-list')
     except Exception as e:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-        messages.error(request, f'Error updating wishlist: {str(e)}')
         return redirect('product-list')

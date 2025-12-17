@@ -1,0 +1,284 @@
+from django.shortcuts import render, redirect
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import login, logout, authenticate
+from django.contrib import messages
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from .models import Product, Category, CustomerProfile
+from .form import CustomerRegistrationForm
+from django.views.decorators.http import require_http_methods
+from django.core.paginator import Paginator
+from django.template.loader import render_to_string
+
+def home(request):
+    biscuits = Product.objects.all()
+    context = {
+        'biscuits': biscuits,
+    }
+    return render(request, 'shop/home.html', context)
+
+def login_view(request):
+    """Handle user login"""
+    if request.method == 'POST':
+        form = AuthenticationForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {username}!')
+                
+                # Redirect to next page or home
+                next_url = request.GET.get('next', 'home')
+                return redirect(next_url)
+        else:
+            messages.error(request, 'Invalid username or password.')
+    else:
+        form = AuthenticationForm()
+    
+    context = {
+        'form': form,
+        'page': 'login'
+    }
+    return render(request, 'shop/login_register.html', context)
+
+def register_view(request):
+    """Handle user registration"""
+    if request.method == 'POST':
+        form = CustomerRegistrationForm(request.POST)
+        if form.is_valid():
+            # Save the new user
+            user = form.save()
+            
+            # Get or create CustomerProfile (signal should handle this, but ensure it exists)
+            customer_profile, created = CustomerProfile.objects.get_or_create(user=user)
+            
+            # Update profile with additional data if provided
+            if form.cleaned_data.get('phone_number'):
+                customer_profile.phone_number = form.cleaned_data['phone_number']
+            if form.cleaned_data.get('address'):
+                customer_profile.address = form.cleaned_data['address']
+            customer_profile.save()
+            
+            # Auto-login the user
+            login(request, user)
+            messages.success(request, f'Account created successfully! Welcome, {user.username}!')
+            
+            return redirect('home')
+        else:
+            # Display form errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f'{field}: {error}')
+    else:
+        form = CustomerRegistrationForm()
+    
+    context = {
+        'form': form,
+        'page': 'register'
+    }
+    return render(request, 'shop/login_register.html', context)
+
+def logout_view(request):
+    """Handle user logout"""
+    username = request.user.username if request.user.is_authenticated else 'User'
+    logout(request)
+    messages.success(request, f'Logged out successfully. See you soon!')
+    return redirect('home')
+
+def products_list_view(request):
+    """Display products with category filtering"""
+    products = Product.objects.all()
+    categories = Category.objects.all()
+    current_category = 0
+    
+    if request.method == 'GET':
+        category_id = request.GET.get('category')
+        if category_id and category_id != '0':
+            products = products.filter(category__id=category_id)
+            current_category = int(category_id)
+    products_page = Paginator(products, 8)  # Show 10 products per page
+    page_number = request.GET.get('page')
+    context = {
+        'products': products_page.get_page(page_number),
+        'categories': categories,
+        'current_category': current_category
+    }
+    return render(request, 'shop/products.html', context)
+
+def product_detail_view(request, product_id):
+    """Return product detail as JSON (for modal display)"""
+    try:
+        product = Product.objects.get(id=product_id)
+        # Get wishlist from session
+        wishlist = request.session.get('wishlist', [])
+        context = {
+            'product': product,
+            'wishlist': wishlist
+        }
+        html = render_to_string('shop/product_detail.html', context, request=request)
+        return JsonResponse({'success': True, 'html': html})
+    except Product.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+
+# Cart management views
+def cart_view(request):
+    """Display shopping cart"""
+    cart = request.cart
+    
+    # Get product IDs from cart
+    product_ids = [int(pid) for pid in cart.cart.keys()]
+    
+    # Fetch products
+    if product_ids:
+        products_in_cart = Product.objects.filter(id__in=product_ids)
+        products_dict = {str(p.id): p for p in products_in_cart}    #type: ignore
+    else:
+        products_dict = {}
+    
+    # Build cart display
+    cart_items = []
+    for product_id_str, item_data in cart.cart.items():
+        product = products_dict.get(product_id_str)
+        if product:
+            cart_items.append({
+                'product': product,
+                'quantity': item_data['quantity'],
+                'subtotal': float(item_data['price']) * item_data['quantity']
+            })
+    
+    context = {
+        'cart_items': cart_items,
+        'cart_total': cart.get_total_price(),
+    }
+    return render(request, 'shop/cart.html', context)
+
+@require_http_methods(["POST"])
+def add_to_cart(request, product_id):
+    """Add product to cart (AJAX)"""
+    try:
+        product = Product.objects.get(id=product_id)
+        cart = request.cart
+        cart.add_item(product)
+        
+        # Check for AJAX request
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'cart_count': cart.__len__(),
+                'cart_total_price': float(cart.get_total_price())
+            })
+            
+        return redirect('cart')
+    
+    except Product.DoesNotExist:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+        messages.error(request, 'Product not found.')
+        return redirect('product-list')
+    
+    except Exception as e:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        messages.error(request, 'Error adding product to cart.')
+        return redirect('product-list')
+
+def remove_from_cart(request, product_id):
+    """Remove product from cart"""
+    try:
+        cart = request.cart
+        cart.remove_item(product_id)
+        messages.success(request, 'Product removed from cart.')
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'cart_count': cart.__len__(),
+                'cart_total_price': float(cart.get_total_price())
+            })
+            
+    except Exception as e:
+        messages.error(request, f'Error removing product: {str(e)}')
+    return redirect('cart')
+
+def substract_item_qty_from_cart(request, product_id):
+    """Decrease product quantity in cart"""
+    try:
+        cart = request.cart
+        cart.substract_number_of_item(product_id)
+        messages.success(request, 'Product quantity decreased.')
+        
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'cart_count': cart.__len__(),
+                'cart_total_price': float(cart.get_total_price())
+            })
+            
+    except Exception as e:
+        messages.error(request, f'Error updating quantity: {str(e)}')
+    return redirect('cart')
+
+
+#wishlist management views 
+def wishlist_view(request):
+    """Display wishlist"""
+    wishlist = request.wishlist
+    
+    # Get product IDs from wishlist
+    product_ids = wishlist.get_products()
+    
+    # Fetch actual Product objects
+    if product_ids:
+        wishlist_products = Product.objects.filter(id__in=product_ids)
+    else:
+        wishlist_products = Product.objects.none()
+    
+    context = {
+        'wishlist_products': wishlist_products,
+    }
+    return render(request, 'shop/wishlist.html', context)
+
+@require_http_methods(["POST"])
+def toggle_favorite(request, product_id):
+    """Toggle product in wishlist (add/remove via AJAX)"""
+    try:
+        product = Product.objects.get(id=product_id)
+        wishlist = request.wishlist  # Get the Wishlist object, not the list!
+        
+        # Check if product is already in wishlist
+        is_favorited = wishlist.is_in_wishlist(product_id)
+        
+        # Toggle
+        if is_favorited:
+            wishlist.remove(product_id)
+            was_added = False
+            messages.info(request, f'{product.name} removed from wishlist.')
+        else:
+            wishlist.add(product_id)
+            was_added = True
+            messages.success(request, f'{product.name} added to wishlist.')
+        
+        # Check for AJAX request and return JSON
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'is_favorited': was_added,      # True if just added, False if just removed
+                'wishlist_count': wishlist.__len__(),
+            })
+        
+        # Non-AJAX fallback: redirect to referrer
+        return redirect(request.META.get('HTTP_REFERER', 'product-list'))
+        
+    except Product.DoesNotExist:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+        messages.error(request, 'Product not found.')
+        return redirect('product-list')
+    except Exception as e:
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': False, 'error': str(e)}, status=500)
+        messages.error(request, f'Error updating wishlist: {str(e)}')
+        return redirect('product-list')

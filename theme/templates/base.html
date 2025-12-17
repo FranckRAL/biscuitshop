@@ -1,0 +1,33 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Django Tailwind</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    {% tailwind_css %}
+</head>
+
+<body>
+    <header class="bg-yellow-200 p-4">
+        <h1 class="text-3xl font-bold">Welcome to the Biscuit Shop</h1>
+        <nav class="mt-2">
+            <ul class="flex space-x-4">
+                <li class="font-semibold"><a href="" class="text-blue-600">Home</a></li>
+                <li class="font-semibold"><a href="" class="text-blue-600">Products</a></li>
+                <li class="font-semibold"><a href="" class="text-blue-600">About Us</a></li>
+                <li class="font-semibold"><a href="" class="text-blue-600">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main class="p-4">
+        {% block content %}
+        <!-- Main content will be injected here -->
+        {% endblock %}
+    </main>
+    <footer class="bg-yellow-200 p-4 text-center">
+        <p class="text-gray-700">&copy; 2024 Biscuit Shop. All rights reserved.</p>
+    </footer>
+</body>
+</html>

@@ -1,0 +1,79 @@
+{% extends "shop/main.html" %}
+{% load static %}
+
+{% block title %}Favorites - Biscuit Shop{% endblock %}
+
+{% block content %}
+    <!-- CSRF token MUST be at top -->
+    <div style="display:none;">
+        {% csrf_token %}
+    </div>
+
+    <div  class="fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-[5px] z-60 hidden" id="product-detail-overlay">
+        <div class="product-details-modal bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-20 relative">
+            <button id="close-modal" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer">
+                <i class="bi bi-x-lg text-2xl"></i>
+            </button>
+            <div id="product-details-content">
+                <!-- Product details will be loaded here via AJAX -->
+                 <div>
+                    <h2 class="text-2xl font-bold mb-4">Loading...</h2>
+                    <p class="text-gray-600">Please wait while we load the product details.</p>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto p-4">
+        <h2 class="text-2xl font-bold mb-4">Favorites Products</h2>
+        <p class="mb-4 text-gray-700">Your favorites products are listed below.</p>
+        {% if wishlist_products %}
+            <div class="biscuit-section mt-6 w-screen">
+                <ul class="biscuit-list flex flex-wrap gap-4 w-screen">
+                    {% for product in wishlist_products %}
+                        <li class="product-card  border border-gray-300  rounded shadow-lg w-1/5" data-detail-url="{% url 'product-detail' product.id %}">
+                            <div class="product-image mb-2 relative">
+                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded cursor-pointer" loading="lazy">
+                                <button class="favorite-btn absolute top-2 right-2 bg-[rgba(0,0,0,0.3)] p-2 rounded-full shadow hover:bg-[rgba(0,0,0,0.5)] cursor-pointer transition-all"
+                                    data-url="{% url 'toggle-favorite' product.id %}"
+                                    data-product-id="{{ product.id }}"
+                                    title="Remove from wishlist">
+                                    <i class="bi bi-heart-fill text-red-500"></i>
+                                </button>
+                            </div>
+                            <div class="p-4">
+                                <h3 class="text-lg font-semibold mb-2 text-gray-700 cursor-pointer">{{ product.name }}</h3>
+                                <p class="text-gray-600 text-sm">{{ product.description|truncatewords:10 }}</p>
+                                <p class="text-green-600 font-bold mt-2">${{ product.price }}</p>
+                                <hr class="my-2">
+                                <div class="flex gap-2">
+                                    <button  
+                                        class="add-cart-btn flex-1 mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer transition-all text-sm"
+                                        data-url="{% url 'add-to-cart' product.id %}"
+                                        aria-label="Add {{ product.name }} to cart"
+                                    >
+                                        <i class="bi bi-cart-plus"></i> Add to Cart
+                                    </button>
+                                </div>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% else %}
+            <div class="flex justify-center items-center mt-10 h-96">
+                <div class="text-center">
+                    <i class="bi bi-heart text-gray-300 text-6xl mb-4"></i>
+                    <p class="text-gray-600 text-lg">You have no favorite products yet. Browse our 
+                        <a href="{% url 'product-list' %}" class="text-blue-600 hover:underline font-semibold">shop</a> to add some!
+                    </p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'js/utils.js'%}"></script>
+    <script src="{% static 'js/wishlist.js' %}"></script>
+{% endblock %}

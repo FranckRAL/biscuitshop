@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from .models import Product, Category, CustomerProfile
+from .models import Product, Category, CustomerProfile, WishlistItem, CartItem, Order, OrderItem
 from .form import CustomerRegistrationForm
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
+
 
 def home(request):
     biscuits = Product.objects.all()
@@ -155,6 +157,7 @@ def cart_view(request):
     }
     return render(request, 'shop/cart.html', context)
 
+
 @require_http_methods(["POST"])
 def add_to_cart(request, product_id):
     """Add product to cart (AJAX)"""
@@ -163,7 +166,6 @@ def add_to_cart(request, product_id):
         cart = request.cart
         cart.add_item(product)
         
-        # Check for AJAX request
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
@@ -178,12 +180,12 @@ def add_to_cart(request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
         return redirect('product-list')
-    
+
     except Exception as e:
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
-        messages.error(request, 'Error adding product to cart.')
         return redirect('product-list')
+
 
 def remove_from_cart(request, product_id):
     """Remove product from cart"""
@@ -203,6 +205,7 @@ def remove_from_cart(request, product_id):
         pass
     return redirect('cart')
 
+
 def substract_item_qty_from_cart(request, product_id):
     """Decrease product quantity in cart"""
     try:
@@ -220,7 +223,6 @@ def substract_item_qty_from_cart(request, product_id):
     except Exception as e:
         pass
     return redirect('cart')
-
 
 #wishlist management views 
 def wishlist_view(request):
@@ -246,11 +248,10 @@ def toggle_favorite(request, product_id):
     """Toggle product in wishlist (add/remove via AJAX)"""
     try:
         product = Product.objects.get(id=product_id)
-        wishlist = request.wishlist  # Get the Wishlist object, not the list!
+        wishlist = request.wishlist  
         
         # Check if product is already in wishlist
         is_favorited = wishlist.is_in_wishlist(product_id)
-        
         # Toggle
         if is_favorited:
             wishlist.remove(product_id)
@@ -261,16 +262,14 @@ def toggle_favorite(request, product_id):
             was_added = True
             message = f'{product.name} added to wishlist.'
         
-        # Check for AJAX request and return JSON
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
-                'is_favorited': was_added,      # True if just added, False if just removed
+                'is_favorited': was_added,      
                 'wishlist_count': wishlist.__len__(),
                 'message': message
             })
         
-        # Non-AJAX fallback: redirect to referrer
         return redirect(request.META.get('HTTP_REFERER', 'product-list'))
         
     except Product.DoesNotExist:

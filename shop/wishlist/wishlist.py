@@ -1,38 +1,79 @@
+from shop.models import Product, WishlistItem
+
+
 class Wishlist:
     def __init__(self, request) -> None:
         self.session = request.session
+        self.request = request
+        self.is_authenticated = request.user.is_authenticated
         wishlist = self.session.get('wishlist')
         if not wishlist:
             wishlist = self.session['wishlist'] = []
         self.wishlist = wishlist
+        self._sync_wishlist_session_and_db()
         
     def add(self, product_id):
         """Add product to wishlist"""
         product_id = str(product_id)  # Ensure string for consistency
+        if self.is_authenticated:
+            try:
+                product = Product.objects.get(id=product_id)
+                _ , created = WishlistItem.objects.get_or_create(user=self.request.user, product=product)
+                print('Added to wishlist successfully! | authenticated user')
+                if not created:
+                    return
+            except Exception as e:
+                print('Error adding to wishlist:', e)
+            
         if product_id not in self.wishlist:
             self.wishlist.append(product_id)
+            print('Added to wishlist successfully! | session user')
             self.save()
             
     def remove(self, product_id):
         """Remove product from wishlist"""
-        product_id = str(product_id)  # Ensure string for consistency
+        product_id = int(product_id)  # Ensure string for consistency
+        print('self.is_authenticated at wishlist remove:', self.is_authenticated)
+        print('product_id:', product_id,' and type:', type(product_id))
+        print( 'self.wishlist:', self.wishlist, 'and type: ', type(self.wishlist))
+        
         if product_id in self.wishlist:
             self.wishlist.remove(product_id)
-            self.save()
+            print('Removed from wishlist successfully! | session user')
+            if self.is_authenticated:
+                try:
+                    product = Product.objects.get(id=product_id)
+                    WishlistItem.objects.filter(user=self.request.user, product=product).delete()
+                    print('Removed from wishlist successfully! | authenticated user')
+                except Exception as e:
+                    print('Error removing from wishlist:', e)
+            print('self.wishlist at wishlist remove:', self.wishlist, 'product_id:', product_id)
+            
+        self.save()
     
     def is_in_wishlist(self, product_id):
         """Check if product is in wishlist"""
+        if self.is_authenticated:
+            try:
+                product = Product.objects.get(id=int(product_id))
+                return WishlistItem.objects.filter(user=self.request.user, product=product).exists()
+            except Exception as e:
+                print('Error checking wishlist:', e)
+                return False
+        
         return str(product_id) in self.wishlist
             
     def save(self):
         """Save wishlist to session"""
         self.session['wishlist'] = self.wishlist
+        self._sync_wishlist_session_and_db()
         self.session.modified = True
         
     def clear(self):
         """Clear wishlist"""
         self.session['wishlist'] = []
         self.wishlist = []
+        self._sync_wishlist_session_and_db()
         self.session.modified = True
     
     def get_products(self):
@@ -53,3 +94,45 @@ class Wishlist:
         products = Product.objects.filter(id__in=self.wishlist)
         for product in products:
             yield product
+            
+    def _sync_wishlist_session_and_db(self):
+        """Sync wishlist between session and database"""
+        if not self.is_authenticated:
+            return 
+
+        session_ids = set(self.wishlist)  
+
+        try:
+            db_items = WishlistItem.objects.filter(user=self.request.user)
+            db_ids = set(item.product_id for item in db_items) #type: ignore
+        except Exception as e:
+            print('Error syncing wishlist:', e)
+            return
+
+        # Remove items from DB that are NOT in session
+        items_to_remove = db_ids - session_ids
+        if items_to_remove:
+            try:
+                WishlistItem.objects.filter(
+                    user=self.request.user,
+                    product_id__in=items_to_remove
+                ).delete()
+            except Exception as e:
+                print('Error removing items from wishlist:', e)
+
+        # Add items to DB that ARE in session
+        items_to_add = session_ids - db_ids
+        try:
+            for product_id in items_to_add:
+                WishlistItem.objects.get_or_create(
+                    user=self.request.user,
+                    product_id=product_id
+                )
+        except Exception as e:
+            print('Error adding items to wishlist:', e)
+
+        self.request.session.modified = True
+
+            
+        
+                    

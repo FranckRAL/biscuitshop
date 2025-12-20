@@ -280,3 +280,4 @@ def toggle_favorite(request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
         return redirect('product-list')
+    

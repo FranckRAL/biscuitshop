@@ -22,4 +22,11 @@ urlpatterns = [
     path('toggle-favorite/<int:product_id>/', views.toggle_favorite, name='toggle-favorite'),
     
     
+    path('checkout/', views.checkout_view, name='checkout'),
+    path('payment/<int:order_id>/', views.process_payment, name='process_payment'),
+    path('payment/<int:order_id>/confirm/', views.confirm_payment, name='confirm_payment'),
+    path('order-success/<int:order_id>/', views.order_success, name='order_success'),
+    path('mvola/callback/', views.mvola_callback, name='mvola_callback')
+    
+    
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

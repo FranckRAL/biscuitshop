@@ -6,10 +6,17 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from .models import Product, Category, CustomerProfile, WishlistItem, CartItem, Order, OrderItem
-from .form import CustomerRegistrationForm
+from .forms import CustomerRegistrationForm, CheckoutForm
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
+from decimal import Decimal
+from shop.payment.payment_service import PaymentService
+from shop.payment.mvola_service import MvolaPaymentService
+from shop.payment.paypal_service import PaypalPaymentService
+from django.views.decorators.csrf import csrf_exempt
+import json
+
 
 
 def home(request):
@@ -280,4 +287,134 @@ def toggle_favorite(request, product_id):
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             return JsonResponse({'success': False, 'error': str(e)}, status=500)
         return redirect('product-list')
+
+
+@login_required(login_url='login')
+def checkout_view(request):
+    """Handle checkout and order creation"""
+    cart = request.cart
     
+    # Redirect if cart is empty
+    if len(cart) == 0:
+        messages.warning(request, 'Your cart is empty!')
+        return redirect('cart')
+    
+    # Handle POST request (form submission)
+    if request.method == 'POST':
+        form = CheckoutForm(request.POST)
+        if form.is_valid():
+            # Create order
+            order = Order.objects.create(
+                user=request.user,
+                status='pending',
+                total_price=Decimal('0.00')
+            )
+            
+            # Add items to order
+            total = Decimal('0.00')
+            for item in cart:
+                product = Product.objects.get(id=item["product_id"])
+                quantity = item["quantity"]
+                price = product.price
+                
+                OrderItem.objects.create(
+                    order=order,
+                    product=product,
+                    quantity=quantity,
+                    price=price
+                )
+                total += price * quantity
+            
+            order.total_price = total
+            order.payment_method = form.cleaned_data["payment_method"]
+            order.save()
+            
+            # Process payment
+            payment_method = form.cleaned_data["payment_method"]
+            if payment_method == "cod":
+                # Cash on Delivery - mark as pending
+                order.status = 'pending'
+                order.save()
+                cart.clear()
+                return redirect('order_success', order_id=order.id) #type: ignore
+            else:
+                # Other payment methods - redirect to payment
+                cart.clear()
+                return redirect('process_payment', order_id=order.id) #type: ignore
+    else:
+        form = CheckoutForm()
+    
+    # GET request - show checkout form with order summary
+    context = {
+        'form': form,
+        'cart_total': cart.get_total_price(),
+        'cart_items_count': len(cart)
+    }
+    return render(request, 'shop/checkout_success.html', context)
+
+@login_required(login_url='login')
+def process_payment(request, order_id):
+    """Handle payment processing for different methods"""
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+    except Order.DoesNotExist:
+        messages.error(request, 'Order not found.')
+        return redirect('home')
+    
+    services: dict[str, PaymentService] = {
+        "mvola": MvolaPaymentService(),
+        "paypal": PaypalPaymentService(),
+    }
+    
+    service = services.get(order.payment_method)
+    
+    result = service.initiate_payment(request, order) #type: ignore
+    if 'redirect_url' in result:
+        return redirect(result["redirect_url"])
+    
+    return redirect('confirm_payment', order_id=order.id)  #type: ignore 
+
+
+@require_http_methods(["POST"])
+def confirm_payment(request, order_id):
+    """Confirm payment and mark order as completed"""
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        
+        services: dict[str, PaymentService] = {
+        "mvola": MvolaPaymentService(),
+        "paypal": PaypalPaymentService(),
+        }
+    
+        service = services.get(order.payment_method)
+        order.status = service.check_status(order) #type: ignore
+        
+        order.save()
+        
+        messages.success(request, 'Payment successful! Your order has been placed.')
+        return redirect('order_success', order_id=order.id) #type: ignore
+        
+    except Order.DoesNotExist:
+        messages.error(request, 'Order not found.')
+        return redirect('home')
+    except Exception as e:
+        messages.error(request, f'Payment failed: {str(e)}')
+        return redirect('process_payment', order_id=order_id)
+
+
+def order_success(request, order_id):
+    """Display order confirmation"""
+    try:
+        order = Order.objects.get(id=order_id, user=request.user)
+        context = {'order': order}
+        return render(request, 'shop/payment/order_success.html', context)
+    except Order.DoesNotExist:
+        messages.error(request, 'Order not found.')
+        return redirect('home')
+    
+@csrf_exempt
+def mvola_callback(request):
+    data = json.loads(request.body)
+    service = MvolaPaymentService()
+    service.handle_callback(data)
+    return JsonResponse({"message": "Callback processed"})

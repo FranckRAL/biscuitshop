@@ -1,0 +1,64 @@
+{% extends 'shop/main.html' %}
+{% load static %}
+{% block content %}
+<div class="max-w-4xl mx-auto p-6">
+    <!-- Success Message -->
+    <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-6 text-center">
+        <h1 class="text-3xl font-bold text-green-600 mb-2">✓ Order Confirmed!</h1>
+        <p class="text-gray-600">Thank you for your purchase. Your order has been placed successfully.</p>
+    </div>
+    
+    <!-- Order Details -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Order Summary -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
+            <div class="space-y-3">
+                <p><strong>Order ID:</strong> <span class="text-blue-600">#{{ order.id }}</span></p>
+                <p><strong>Status:</strong> <span class="text-green-600 font-semibold">{{ order.status|upper }}</span></p>
+                <p><strong>Total Price:</strong> <span class="text-green-600 font-bold text-lg">${{ order.total_price }}</span></p>
+                <p><strong>Payment Method:</strong> <span class="text-gray-700">{{ order.payment_method|upper }}</span></p>
+                <p><strong>Order Date:</strong> <span class="text-gray-600">{{ order.created_at|date:"M d, Y H:i" }}</span></p>
+            </div>
+        </div>
+        
+        <!-- Items in Order -->
+        <div class="bg-white shadow-md rounded-lg p-6">
+            <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Items Ordered</h2>
+            <ul class="space-y-3">
+                {% for item in order.items.all %}
+                    <li class="flex justify-between items-center border-b pb-2">
+                        <div>
+                            <p class="font-medium">{{ item.product.name }}</p>
+                            <p class="text-sm text-gray-500">Qty: {{ item.quantity }}</p>
+                        </div>
+                        <p class="font-semibold">${{ item.price }}</p>
+                    </li>
+                {% empty %}
+                    <li class="text-gray-500">No items in this order.</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Next Steps -->
+    <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mt-6">
+        <h3 class="text-lg font-semibold mb-3">What's Next?</h3>
+        <ul class="list-disc list-inside space-y-2 text-gray-700">
+            <li>A confirmation email has been sent to {{ request.user.email }}</li>
+            <li>You will receive tracking information once your order ships</li>
+            <li>Estimated delivery: 5-7 business days</li>
+        </ul>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="flex gap-4 mt-6 justify-center">
+        <a href="{% url 'home' %}" class="bg-indigo-600 text-white px-6 py-2 rounded-md hover:bg-indigo-700">
+            Continue Shopping
+        </a>
+        <a href="{% url 'product-list' %}" class="bg-gray-600 text-white px-6 py-2 rounded-md hover:bg-gray-700">
+            View Products
+        </a>
+    </div>
+</div>
+{% endblock %}

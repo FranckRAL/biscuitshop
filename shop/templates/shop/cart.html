@@ -50,6 +50,7 @@
         </tbody>
     </table>
     <p class="text-right font-bold mt-4">Total: ${{ cart.get_total_price }}</p>
+    <p class="text-right mt-4"><a href="{% url 'checkout' %}" class="btn p-3 text-white bg-blue-500 hover:bg-blue-600 rounded">Proceed to Checkout</a></p>
 {% else %}
     <div class="flex justify-center items-center text-gray-600 w-full mt-10 ">
         <p class="text-lg">Your cart is empty.</p>

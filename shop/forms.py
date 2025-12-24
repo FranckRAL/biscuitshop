@@ -1,7 +1,6 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomerProfile
 
 class CustomerRegistrationForm(UserCreationForm):
     """Form for user registration with profile fields"""
@@ -55,44 +54,40 @@ class CustomerRegistrationForm(UserCreationForm):
             user.refresh_from_db()
         return user
     
-# from django.contrib.auth.forms import UserCreationForm
-# from django import forms
-# from django.contrib.auth.models import User
-# from .models import CustomerProfile
-
-# class CustomerRegistrationForm(UserCreationForm):
-#     address = forms.CharField(widget=forms.TextInput, required=False)
-#     phone_number = forms.CharField(max_length=15, required=False)
+class CheckoutForm(forms.Form):
+    payment_method = forms.ChoiceField(
+        choices=[
+            ("mvola", "Mvola"),
+            ("orange", "Orange Money"),
+            ("airtel", "Airtel Money"),
+            ("card", "Credit/Debit Card"),
+            ("paypal", "PayPal"),
+            ("cod", "Cash on Delivery"),
+        ]
+    )
+    wallet_number = forms.CharField(required=False)
+    card_number = forms.CharField(required=False)
+    expiry_date = forms.CharField(required=False)
+    cvv = forms.CharField(required=False)
+    paypal_email = forms.EmailField(required=False)
     
-#     class Meta:
-#         model = User
-#         fields = ['username', 'email', 'password1', 'password2']
     
-#     def __init__(self, *args, **kwargs):
-#         super().__init__(*args, **kwargs)
+    def clean(self):
+        cleaned_data = super().clean()
+        method = cleaned_data.get("payment_method")
 
-#         tailwind_classes = (
-#             "block w-full rounded-md border-gray-300 shadow-sm "
-#             "focus:border-indigo-500 focus:ring-indigo-500 px-3 py-2 shadow-sm sm:text-sm"
-#         )
-
-#         for field_name, field in self.fields.items():
-#             field.widget.attrs.update({
-#                 "class": tailwind_classes,
-#                 "placeholder": field.label
-#             })
-            
-    
-#     def save(self, commit=True):
-#         user = super().save(commit=commit)
-#         address = self.cleaned_data.get('address')
-#         phone_number = self.cleaned_data.get('phone_number')
-        
-#         if commit:
-#             CustomerProfile.objects.create(
-#                 user=user,
-#                 address=address,
-#                 phone_number=phone_number
-                
-#             )
-#         return user
+        if method in ["mvola", "orange", "airtel"]:
+            if not cleaned_data.get("wallet_number"):
+                self.add_error("wallet_number", "Wallet number is required for mobile money.")
+        elif method == "card":
+            if not cleaned_data.get("card_number"):
+                self.add_error("card_number", "Card number is required.")
+            if not cleaned_data.get("expiry_date"):
+                self.add_error("expiry_date", "Expiry date is required.")
+            if not cleaned_data.get("cvv"):
+                self.add_error("cvv", "CVV is required.")
+        elif method == "paypal":
+            if not cleaned_data.get("paypal_email"):
+                self.add_error("paypal_email", "PayPal email is required.")
+        # COD requires no extra fields
+        return cleaned_data

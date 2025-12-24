@@ -134,6 +134,16 @@ class Cart:
         """Allow iteration over cart items"""
         return iter(self.cart.values())
     
+    def clear(self):
+        self.cart = {}
+        if self.is_authenticated:
+            try:
+                cart_items = CartItem.objects.filter(user=self.request.user)
+                for cart_item in cart_items:
+                    cart_item.delete()
+            except Exception as e:
+                print('Error clearing the cart: ', e)
+        
     def get_total_price(self):
         """Return the total price of items in the cart.
 
@@ -167,7 +177,7 @@ class Cart:
                 user=self.request.user,
                 product=product,
                 quantity=self.cart[str(product_id)]["quantity"],
-                price=self.cart[str(product_id)]["price"],  # assuming you added a price field
+                session_key=self.request.session.session_key
             )
 
         # Update existing items if quantity/price differ
@@ -194,3 +204,5 @@ class Cart:
                 pass
 
         self.session.modified = True
+        
+    

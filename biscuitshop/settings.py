@@ -1,8 +1,14 @@
 
 from pathlib import Path
+import environ
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+env = environ.Env()
+environ.Env.read_env()
+ENV_MODE = env('ENV_MODE')
+
 
 
 # Quick-start development settings - unsuitable for production
@@ -15,6 +21,19 @@ SECRET_KEY = 'django-insecure-1nnn(1fvc%@@92)=cmx8n=x!ca%^d$*49l4#5v8a*l=(n3z9v2
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
+
+# Mvola API constant
+MVOLA_API_URL = env('SANDBOX_MVOLA_API_URL') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_API_URL')
+MVOLA_CLIENT_ID = env('SANDBOX_MVOLA_CLIENT_ID') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_CLIENT_ID')
+MVOLA_SECRET_KEY = env('SANDBOX_MVOLA_SECRET_KEY') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_SECRET_KEY')
+MVOLA_PARTNER_MSISDN = env('SANDBOX_MVOLA_PARTNER_MSISDN') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_PARTNER_MSISDN')
+MVOLA_PARTNER_NAME = env('MVOLA_PARTNER_NAME')
+MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_ACCESS_TOKEN_ENDPOINT')
+MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
+
+
+
+
 
 
 # Application definition

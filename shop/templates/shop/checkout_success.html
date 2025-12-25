@@ -6,14 +6,14 @@
     <div class="cart-summary bg-white shadow-md rounded-lg p-6">
         <h2 class="text-2xl font-semibold mb-4 border-b pb-2">Order Summary</h2>
         <ul class="space-y-3">
-            {% for item in order.items.all %}
+            {% for item in cart_items %}
                 <li class="flex justify-between items-center border-b pb-2">
                     <div>
                         <p class="font-medium">{{ item.product.name }}</p>
                         <p class="text-sm text-gray-500">Quantity: {{ item.quantity }}</p>
                     </div>
                     <p class="text-right font-semibold text-gray-700">
-                        ${{ item.price }}
+                        ${{ item.subtotal }}
                     </p>
                 </li>
             {% empty %}
@@ -24,10 +24,9 @@
         <div class="mt-4 border-t pt-4">
             <p class="flex justify-between">
                 <span class="font-medium">Total Price:</span>
-                <span class="font-bold text-green-600">${{ order.total_price }}</span>
+                <span class="font-bold text-green-600">${{ cart_total_price }}</span>
             </p>
-            <p class="text-sm text-gray-500 mt-2">Status: {{ order.status }}</p>
-            <p class="text-sm text-gray-500">Created at: {{ order.created_at }}</p>
+            <p class="text-sm text-gray-500">Created at: {{ datetime.now|date:"Y-m-d H:i"}}</p>
         </div>
     </div>
 
@@ -94,7 +93,7 @@
             </div>
 
             <!-- Submit -->
-            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer">
                 Place Order
             </button>
         </form>

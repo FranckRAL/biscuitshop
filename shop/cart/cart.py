@@ -152,6 +152,18 @@ class Cart:
         """
         return sum(float(item["price"]) * item["quantity"] for item in self.cart.values())
     
+    def get_items(self) -> list:
+        if len(self.cart) == 0: return []
+        items = []
+        for item in self.cart.values():
+            product = Product.objects.get(id=item["product_id"])
+            items.append({
+                'product': product,
+                'quantity': item["quantity"],
+                'subtotal': float(item["price"]) * item["quantity"]
+            })
+        return items
+        
     def _sync_cart_session_and_db(self):
         if not self.is_authenticated:
             return

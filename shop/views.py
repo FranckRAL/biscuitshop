@@ -5,16 +5,20 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
-from .models import Product, Category, CustomerProfile, WishlistItem, CartItem, Order, OrderItem
+from .models import Product, Category, CustomerProfile, Order, OrderItem
 from .forms import CustomerRegistrationForm, CheckoutForm
 from django.views.decorators.http import require_http_methods
 from django.core.paginator import Paginator
 from django.template.loader import render_to_string
+from django.db import transaction
 from decimal import Decimal
-from shop.payment.payment_service import PaymentService
+import json
+import logging
 from shop.payment.mvola_service import MvolaPaymentService
 from shop.payment.paypal_service import PaypalPaymentService
 from django.views.decorators.csrf import csrf_exempt
+
+logger = logging.getLogger(__name__)
 import json
 
 
@@ -250,6 +254,7 @@ def wishlist_view(request):
     }
     return render(request, 'shop/wishlist.html', context)
 
+
 @require_http_methods(["POST"])
 def toggle_favorite(request, product_id):
     """Toggle product in wishlist (add/remove via AJAX)"""
@@ -299,6 +304,7 @@ def checkout_view(request):
         messages.warning(request, 'Your cart is empty!')
         return redirect('cart')
     
+    
     # Handle POST request (form submission)
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
@@ -307,7 +313,10 @@ def checkout_view(request):
             order = Order.objects.create(
                 user=request.user,
                 status='pending',
-                total_price=Decimal('0.00')
+                total_price=Decimal('0.00'),
+                payment_method=form.cleaned_data["payment_method"],
+                customer_phone=form.cleaned_data.get("phone_number", ""),
+                customer_address=form.cleaned_data.get("address", "")
             )
             
             # Add items to order
@@ -326,19 +335,20 @@ def checkout_view(request):
                 total += price * quantity
             
             order.total_price = total
-            order.payment_method = form.cleaned_data["payment_method"]
             order.save()
             
-            # Process payment
+            # Process payment based on method
             payment_method = form.cleaned_data["payment_method"]
+            
             if payment_method == "cod":
-                # Cash on Delivery - mark as pending
-                order.status = 'pending'
+                # Cash on Delivery - mark as completed and clear cart
+                order.status = 'completed'
                 order.save()
                 cart.clear()
+                messages.success(request, 'Order placed successfully! We will contact you soon.')
                 return redirect('order_success', order_id=order.id) #type: ignore
             else:
-                # Other payment methods - redirect to payment
+                # Online payment - redirect to payment processing
                 cart.clear()
                 return redirect('process_payment', order_id=order.id) #type: ignore
     else:
@@ -346,8 +356,8 @@ def checkout_view(request):
     
     # GET request - show checkout form with order summary
     context = {
-        'form': form,
-        'cart_total': cart.get_total_price(),
+        'cart_items': cart.get_items(),
+        'cart_total_price': cart.get_total_price(),
         'cart_items_count': len(cart)
     }
     return render(request, 'shop/checkout_success.html', context)
@@ -360,46 +370,127 @@ def process_payment(request, order_id):
     except Order.DoesNotExist:
         messages.error(request, 'Order not found.')
         return redirect('home')
-    
-    services: dict[str, PaymentService] = {
+
+    # Ensure order is still pending
+    if order.status != 'pending':
+        # messages.warning(request, f'Order status is {order.get_status_display()}')
+        return redirect('order_success', order_id=order.id) #type: ignore
+
+    # Initialize payment service based on payment method
+    services = {
         "mvola": MvolaPaymentService(),
         "paypal": PaypalPaymentService(),
     }
     
     service = services.get(order.payment_method)
+    if not service:
+        messages.error(request, f'Payment method {order.payment_method} not supported.')
+        return redirect('cart')
     
-    result = service.initiate_payment(request, order) #type: ignore
-    if 'redirect_url' in result:
-        return redirect(result["redirect_url"])
-    
-    return redirect('confirm_payment', order_id=order.id)  #type: ignore 
+    # Initiate payment with the service
+    try:
+        result = service.initiate_payment(request, order)
+        
+        # Check if service returned a redirect URL
+        if 'redirect_url' in result:
+            return redirect(result["redirect_url"])
+        
+        # If no redirect, show payment pending page or redirect to confirmation
+        messages.info(request, 'Payment is being processed. Please wait...')
+        return redirect('confirm_payment', order_id=order.id) #type: ignore
+        
+    except Exception as e:
+        messages.error(request, f'Payment initiation failed: {str(e)}')
+        print(f"[Payment] Error initiating {order.payment_method}: {str(e)}")
+        return redirect('checkout') 
 
 
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "GET"])
 def confirm_payment(request, order_id):
-    """Confirm payment and mark order as completed"""
+    """Confirm payment and mark order as completed
+    
+    This view is called after payment provider confirms the payment.
+    For Mvola, this is triggered by the callback.
+    For PayPal, this can be called via IPN webhook.
+    """
     try:
         order = Order.objects.get(id=order_id, user=request.user)
-        
-        services: dict[str, PaymentService] = {
-        "mvola": MvolaPaymentService(),
-        "paypal": PaypalPaymentService(),
-        }
-    
-        service = services.get(order.payment_method)
-        order.status = service.check_status(order) #type: ignore
-        
-        order.save()
-        
-        messages.success(request, 'Payment successful! Your order has been placed.')
-        return redirect('order_success', order_id=order.id) #type: ignore
-        
     except Order.DoesNotExist:
         messages.error(request, 'Order not found.')
         return redirect('home')
+    
+    # If order is already completed or failed, don't reprocess
+    if order.status in ['completed', 'failed', 'cancelled']:
+        return redirect('order_success', order_id=order.id) #type: ignore
+    
+    
+    # Initialize payment service
+    services = {
+        "mvola": MvolaPaymentService(),
+        "paypal": PaypalPaymentService(),
+    }
+    
+    service = services.get(order.payment_method)
+    if not service:
+        messages.error(request, f'Invalid payment method: {order.payment_method}')
+        return redirect('checkout')
+    
+    try:
+        # Check current payment status with the service (calls Mvola/PayPal API)
+        status = service.check_status(order)
+        logger.info(f"Payment status check for order {order_id}: {status}")
+        
+        # Use atomic transaction to ensure data consistency
+        with transaction.atomic():
+            # Update order status
+            order.status = status
+            order.save()
+            
+            if status == 'completed':
+                # Clear cart and deduct stock
+                _process_completed_order(order, request)
+                messages.success(request, 'Payment successful! Your order has been placed.')
+                logger.info(f"Order {order_id} payment confirmed and cart cleared")
+            elif status == 'failed':
+                messages.error(request, 'Payment failed. Please try again.')
+                logger.warning(f"Payment failed for order {order_id}")
+                return redirect('process_payment', order_id=order.id) #type: ignore
+            else:  # pending
+                messages.info(request, 'Payment is still being processed. Please check back later.')
+                logger.info(f"Payment pending for order {order_id}")
+            
     except Exception as e:
-        messages.error(request, f'Payment failed: {str(e)}')
+        logger.error(f"Error confirming payment for order {order_id}: {str(e)}", exc_info=True)
+        messages.error(request, f'Error confirming payment: {str(e)}')
         return redirect('process_payment', order_id=order_id)
+    
+    return redirect('order_success', order_id=order.id) #type: ignore
+
+
+def _process_completed_order(order, request):
+    """Handle post-payment processing: deduct stock and clear cart
+    
+    Args:
+        order (Order): Completed order object
+        request (Request): Django request object
+    """
+    try:
+        for order_item in order.items.all():
+            product = order_item.product
+            if product.stock >= order_item.quantity:
+                product.stock -= order_item.quantity
+                product.save()
+                logger.info(f"Deducted {order_item.quantity} units from product {product.id}")
+            else:
+                logger.warning(f"Insufficient stock for product {product.id}. Available: {product.stock}, Needed: {order_item.quantity}")
+        
+        cart = request.cart
+        cart.clear()
+        logger.info(f"Cart cleared for user {request.user.id} after order {order.id} completion")
+        
+    except Exception as e:
+        logger.error(f"Error processing completed order {order.id}: {str(e)}", exc_info=True)
+        raise
 
 
 def order_success(request, order_id):
@@ -410,11 +501,39 @@ def order_success(request, order_id):
         return render(request, 'shop/payment/order_success.html', context)
     except Order.DoesNotExist:
         messages.error(request, 'Order not found.')
+        logger.warning(f"Order {order_id} not found for user {request.user.id}")
         return redirect('home')
     
 @csrf_exempt
+@require_http_methods(["POST"])
 def mvola_callback(request):
-    data = json.loads(request.body)
-    service = MvolaPaymentService()
-    service.handle_callback(data)
-    return JsonResponse({"message": "Callback processed"})
+    """Handle Mvola payment callback webhook
+    
+    Mvola sends a POST request to this endpoint after payment is processed.
+    This is asynchronous and doesn't require login.
+    """
+    try:
+        # Parse JSON from request body
+        data = json.loads(request.body)
+        logger.info(f"[Mvola Callback] Received: {data}")
+        
+        # Validate callback data contains required fields
+        required_fields = ['requestingOrganisationTransactionReference', 'transactionStatus']
+        if not all(field in data for field in required_fields):
+            logger.error(f"[Mvola Callback] Missing required fields: {list(data.keys())}")
+            return JsonResponse({"status": "error", "message": "Invalid callback format"}, status=400)
+        
+        # Process the callback using Mvola service within atomic transaction
+        with transaction.atomic():
+            service = MvolaPaymentService()
+            service.handle_callback(data)
+        
+        logger.info(f"[Mvola Callback] Successfully processed transaction: {data.get('requestingOrganisationTransactionReference')}")
+        return JsonResponse({"status": "success", "message": "Callback processed"})
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"[Mvola Callback] JSON decode error: {str(e)}")
+        return JsonResponse({"status": "error", "message": "Invalid JSON"}, status=400)
+    except Exception as e:
+        logger.error(f"[Mvola Callback] Error: {str(e)}", exc_info=True)
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)

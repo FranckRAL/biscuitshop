@@ -28,24 +28,35 @@ class MvolaPaymentService(PaymentService):
             if not order.customer_phone:
                 raise ValueError("Customer phone number is required for Mvola payment")
             
+            # Debug: Check if URL and settings are loaded correctly
             url = settings.MVOLA_API_URL
+            logger.debug(f"[Mvola] API URL: {url}")
+            logger.debug(f"[Mvola] Partner MSISDN: {settings.MVOLA_PARTNER_MSISDN}")
+            logger.debug(f"[Mvola] Partner Name: {settings.MVOLA_PARTNER_NAME}")
+            logger.debug(f"[Mvola] Customer Phone: {order.customer_phone}")
+            
+            # Validate URL is not empty or malformed
+            if not url or not url.startswith('https://'):
+                raise ValueError(f"Invalid API URL: {url}. Check MVOLA_API_URL in settings.")
+            
             token = self._get_mvola_token()
             transaction_ref = f"ORDER-{order.id}-{uuid.uuid4().hex[:8]}"
             
-            headers = { 
-                "Authorization": f"Bearer {token}", 
-                "Version": "1.0", 
-                "X-CorrelationID": str(uuid.uuid4()), 
-                "UserLanguage": "FR", 
-                "UserAccountIdentifier": f"msisdn;{settings.MVOLA_PARTNER_MSISDN}", 
-                "partnerName": settings.MVOLA_PARTNER_NAME, 
-                "Content-Type": "application/json", 
-                "X-Callback-URL": request.build_absolute_uri("/mvola/callback/"), 
+            headers = {
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}",
+                "Version": "1.0",
+                "X-CorrelationID": str(uuid.uuid4()),
+                "UserLanguage": "MG",
+                "partnerName": f"{settings.MVOLA_PARTNER_NAME.strip()}",
+                "UseraccountIdentifier": f"msisdn;{settings.MVOLA_PARTNER_MSISDN}",
                 "Cache-Control": "no-cache",
             }
             
+            logger.debug(f"[Mvola] payment headers: {headers} ")
+            
             payload = { 
-                "amount": str(int((order.total_price + 1000))), 
+                "amount": str(int((order.total_price))), 
                 "currency": "Ar", 
                 "descriptionText": f"Order {order.id}", 
                 "requestDate": order.created_at.strftime("%Y-%m-%dT%H:%M:%S.000Z"), 
@@ -55,7 +66,16 @@ class MvolaPaymentService(PaymentService):
                 "requestingOrganisationTransactionReference": transaction_ref,
             }
             
+            logger.debug(f"[Mvola] Request payload: {json.dumps(payload, indent=2)}")
+            logger.info(f"[Mvola] Initiating payment for order {order.id} to {url}")
+            
             resp = requests.post(url, headers=headers, json=payload, timeout=10)
+            
+            # Log response details for debugging
+            logger.debug(f"[Mvola] Response status: {resp.status_code}")
+            logger.debug(f"[Mvola] Response headers: {resp.headers}")
+            logger.debug(f"[Mvola] Response body: {resp.text}")
+            
             resp.raise_for_status()
             data = resp.json()
             
@@ -65,6 +85,7 @@ class MvolaPaymentService(PaymentService):
             order.save()
             
             logger.info(f"[Mvola] Payment initiated for order {order.id}: {data}")
+            print('data from the payment initiation: ', data)
             return data
             
         except requests.exceptions.Timeout:
@@ -72,6 +93,7 @@ class MvolaPaymentService(PaymentService):
             return {"status": "failed", "error": "Request timeout"}
         except requests.exceptions.RequestException as e:
             logger.error(f"[Mvola] API request failed for order {order.id}: {str(e)}")
+            logger.error(f"[Mvola] Full error details: {e.response.text if hasattr(e, 'response') and e.response else 'No response'}")
             return {"status": "failed", "error": str(e)}
         except ValueError as e:
             logger.error(f"[Mvola] Validation error for order {order.id}: {str(e)}")
@@ -101,13 +123,12 @@ class MvolaPaymentService(PaymentService):
             url = f"{settings.MVOLA_API_URL}/{order.transaction_reference}"
             token = self._get_mvola_token()
             
+            # Essential headers for GET request
             headers = {
-                "Authorization": f"Bearer {token}",
-                "Version": "1.0",
-                "X-CorrelationID": str(uuid.uuid4()),
-                "UserLanguage": "FR",
-                "UserAccountIdentifier": f"msisdn;{settings.MVOLA_PARTNER_MSISDN}",
                 "Content-Type": "application/json",
+                "Authorization": f"Bearer {token}",
+                "X-CorrelationID": str(uuid.uuid4()),
+                "Useraccountidentifier": f"msisdn;{settings.MVOLA_PARTNER_MSISDN}",
             }
             
             # Make GET request to check transaction status
@@ -182,9 +203,9 @@ class MvolaPaymentService(PaymentService):
                 order.status = new_status
                 order.transaction_id = data.get("transactionReference", order.transaction_id)
                 order.save()
-                logger.info(f"[Mvola] Order {order.id} status updated from {order.status} to {new_status}")
+                logger.info(f"[Mvola] Order {order.id} status updated from {order.status} to {new_status}") #type: ignore
             else:
-                logger.info(f"[Mvola] Order {order.id} already has status: {new_status}")
+                logger.info(f"[Mvola] Order {order.id} already has status: {new_status}") #type: ignore
             
         except Exception as e:
             logger.error(f"[Mvola] Callback handling failed: {str(e)}", exc_info=True)
@@ -207,28 +228,52 @@ class MvolaPaymentService(PaymentService):
         try:
             url = f"{settings.MVOLA_ACCESS_TOKEN_ENDPOINT}"
             auth = (settings.MVOLA_CLIENT_ID, settings.MVOLA_SECRET_KEY)
-            data = {"grant_type": "client_credentials"}
+            # Include scope in token request to get the right permissions for merchant pay
+            data = {
+                "grant_type": "client_credentials",
+                "scope": settings.MVOLA_API_SCOPE,
+            }
             headers = {"Content-Type": "application/x-www-form-urlencoded"}
             
+            logger.debug(f"[Mvola] Token URL: {url}")
+            logger.debug(f"[Mvola] Token endpoint auth credentials - Client ID: {settings.MVOLA_CLIENT_ID}")
+            logger.debug(f"[Mvola] Requesting scope: {settings.MVOLA_API_SCOPE}")
+            
             resp = requests.post(url, data=data, headers=headers, auth=auth, timeout=10)
+            
+            logger.debug(f"[Mvola] Token response status: {resp.status_code}")
+            logger.debug(f"[Mvola] Token response headers: {resp.headers}")
+            logger.debug(f"[Mvola] Token response body: {resp.text[:200]}")
+            
             resp.raise_for_status()
             
-            token = resp.json()["access_token"]
+            resp_data = resp.json()
+            token = resp_data.get("access_token")
+            
+            if not token:
+                logger.error(f"[Mvola] Token response missing access_token: {resp_data}")
+                raise KeyError("access_token not in response")
             
             # Cache token for 55 minutes (tokens usually valid 1 hour)
             cache.set("mvola_token", token, timeout=3300)
             logger.info("[Mvola] New token obtained and cached")
+            logger.debug(f"[Mvola] Token preview: {token[:20]}...")
             return token
             
         except requests.exceptions.Timeout:
             logger.error("[Mvola] Token request timeout")
             raise Exception("Failed to obtain Mvola token: Request timeout")
         except requests.exceptions.RequestException as e:
-            logger.error(f"[Mvola] Token request failed: {str(e)}")
-            raise Exception(f"Failed to obtain Mvola token: {str(e)}")
+            error_msg = str(e)
+            if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"[Mvola] Token request failed with status {e.response.status_code}: {e.response.text}")
+                error_msg = f"Status {e.response.status_code}: {e.response.text}"
+            else:
+                logger.error(f"[Mvola] Token request failed: {error_msg}")
+            raise Exception(f"Failed to obtain Mvola token: {error_msg}")
         except KeyError:
-            logger.error("[Mvola] Invalid token response format")
-            raise Exception("Failed to obtain Mvola token: Invalid response format")
+            logger.error("[Mvola] Invalid token response format - missing access_token")
+            raise Exception("Failed to obtain Mvola token: Invalid response format - missing access_token")
         except Exception as e:
-            logger.error(f"[Mvola] Unexpected error fetching token: {str(e)}")
+            logger.error(f"[Mvola] Unexpected error fetching token: {str(e)}", exc_info=True)
             raise Exception(f"Failed to obtain Mvola token: {str(e)}")

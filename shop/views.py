@@ -1,26 +1,24 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.forms import AuthenticationForm
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
+from django.template.loader import render_to_string
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, redirect
 from .models import Product, Category, CustomerProfile, Order, OrderItem
 from .forms import CustomerRegistrationForm, CheckoutForm
-from django.views.decorators.http import require_http_methods
-from django.core.paginator import Paginator
-from django.template.loader import render_to_string
-from django.db import transaction
-from decimal import Decimal
-import json
-import logging
+from django.contrib.auth.forms import AuthenticationForm
 from shop.payment.mvola_service import MvolaPaymentService
 from shop.payment.paypal_service import PaypalPaymentService
-from django.views.decorators.csrf import csrf_exempt
-
-logger = logging.getLogger(__name__)
+from django.core.paginator import Paginator
+from django.contrib import messages
+from django.http import JsonResponse
+from django.db import transaction
+from decimal import Decimal
+import logging
 import json
 
+logger = logging.getLogger(__name__)
 
 
 def home(request):
@@ -309,14 +307,38 @@ def checkout_view(request):
     if request.method == 'POST':
         form = CheckoutForm(request.POST)
         if form.is_valid():
+            # Extract customer phone based on payment method
+            payment_method = form.cleaned_data["payment_method"]
+            customer_phone = ""
+            
+            # Get phone number based on payment method
+            if payment_method in ["mvola", "orange", "airtel"]:
+                customer_phone = form.cleaned_data.get("wallet_number", "")
+            elif payment_method == "card":
+                # For card, we don't need phone
+                customer_phone = ""
+            elif payment_method == "paypal":
+                # For PayPal, we don't need phone
+                customer_phone = ""
+            
+            # Validate phone number is present for mobile money
+            if payment_method in ["mvola", "orange", "airtel"] and not customer_phone:
+                messages.error(request, f"Wallet number is required for {payment_method.title()} payment.")
+                return render(request, 'shop/checkout_success.html', {
+                    'form': form,
+                    'cart_items': cart.get_items(),
+                    'cart_total_price': cart.get_total_price(),
+                    'cart_items_count': len(cart)
+                })
+            
             # Create order
             order = Order.objects.create(
                 user=request.user,
                 status='pending',
                 total_price=Decimal('0.00'),
-                payment_method=form.cleaned_data["payment_method"],
-                customer_phone=form.cleaned_data.get("phone_number", ""),
-                customer_address=form.cleaned_data.get("address", "")
+                payment_method=payment_method,
+                customer_phone=customer_phone,
+                customer_address=""
             )
             
             # Add items to order
@@ -337,8 +359,7 @@ def checkout_view(request):
             order.total_price = total
             order.save()
             
-            # Process payment based on method
-            payment_method = form.cleaned_data["payment_method"]
+            logger.info(f"Order {order.id} created with payment method {payment_method} and phone {customer_phone}") #type: ignore
             
             if payment_method == "cod":
                 # Cash on Delivery - mark as completed and clear cart
@@ -405,13 +426,12 @@ def process_payment(request, order_id):
         return redirect('checkout') 
 
 
-@require_http_methods(["POST", "GET"])
+@require_http_methods(["POST", "GET", "PUT"])
 def confirm_payment(request, order_id):
     """Confirm payment and mark order as completed
     
     This view is called after payment provider confirms the payment.
     For Mvola, this is triggered by the callback.
-    For PayPal, this can be called via IPN webhook.
     """
     try:
         order = Order.objects.get(id=order_id, user=request.user)
@@ -505,7 +525,7 @@ def order_success(request, order_id):
         return redirect('home')
     
 @csrf_exempt
-@require_http_methods(["POST"])
+@require_http_methods(["POST", "PUT"])
 def mvola_callback(request):
     """Handle Mvola payment callback webhook
     

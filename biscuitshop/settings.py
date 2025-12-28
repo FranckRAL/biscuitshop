@@ -69,6 +69,37 @@ TEMPLATES = [
     },
 ]
 
+# logging config
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': BASE_DIR / 'debug.log',  # path to your log file
+        },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console', 'file'],
+            'level': 'WARNING',
+            'propagate': False,
+        },
+        
+        'shop': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
+            'propagate': False,
+        },
+    },
+}
+
+
 WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 
 
@@ -147,3 +178,5 @@ MVOLA_PARTNER_MSISDN = env('SANDBOX_MVOLA_PARTNER_MSISDN') if ENV_MODE == 'sandb
 MVOLA_PARTNER_NAME = env('MVOLA_PARTNER_NAME')
 MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_ACCESS_TOKEN_ENDPOINT')
 MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
+# Mvola API scopes - request the correct scope for merchant pay operations
+MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay')

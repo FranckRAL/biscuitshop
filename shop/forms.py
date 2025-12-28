@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
+import re
 
 class CustomerRegistrationForm(UserCreationForm):
     """Form for user registration with profile fields"""
@@ -46,6 +47,17 @@ class CustomerRegistrationForm(UserCreationForm):
         if User.objects.filter(email=email).exists():
             raise forms.ValidationError('This email is already registered.')
         return email
+    
+    def clean_phone_number(self):
+        """Validate phone number format (Madagascar: 10-digit starting with 3, or with +261)"""
+        phone = self.cleaned_data.get('phone_number')
+        if phone:
+            # Remove common separators
+            cleaned_phone = re.sub(r'[\s\-\(\)]+', '', phone)
+            # Madagascar phone: 3xxxxxxxxx or +2613xxxxxxxx
+            if not re.match(r'^(\+261|0)?3\d{8}$', cleaned_phone):
+                raise forms.ValidationError('Please enter a valid Madagascar phone number (e.g., 032xxxxxxxx or +2613xxxxxxxx)')
+        return phone
 
     def save(self, commit=True):
         """Save user and return the instance"""
@@ -65,29 +77,48 @@ class CheckoutForm(forms.Form):
             ("cod", "Cash on Delivery"),
         ]
     )
-    wallet_number = forms.CharField(required=False)
-    card_number = forms.CharField(required=False)
-    expiry_date = forms.CharField(required=False)
-    cvv = forms.CharField(required=False)
-    paypal_email = forms.EmailField(required=False)
-    
+    wallet_number = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'Enter mobile money number',
+        'maxlength': '15'
+    }))
+    card_number = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'XXXX XXXX XXXX XXXX',
+        'maxlength': '19'
+    }))
+    expiry_date = forms.CharField(required=False, widget=forms.TextInput(attrs={
+        'placeholder': 'MM/YY',
+        'maxlength': '5'
+    }))
+    cvv = forms.CharField(required=False, widget=forms.PasswordInput(attrs={
+        'placeholder': 'XXX',
+        'maxlength': '4'
+    }))
+    paypal_email = forms.EmailField(required=False, widget=forms.EmailInput(attrs={
+        'placeholder': 'your@paypal.com'
+    }))
     
     def clean(self):
         cleaned_data = super().clean()
         method = cleaned_data.get("payment_method")
 
         if method in ["mvola", "orange", "airtel"]:
-            if not cleaned_data.get("wallet_number"):
+            wallet = cleaned_data.get("wallet_number")
+            if not wallet:
                 self.add_error("wallet_number", "Wallet number is required for mobile money.")
+            elif not re.match(r'^(\+261|0)?3\d{8}$', re.sub(r'[\s\-\(\)]+', '', wallet)):
+                self.add_error("wallet_number", "Invalid phone number format for mobile money.")
         elif method == "card":
             if not cleaned_data.get("card_number"):
                 self.add_error("card_number", "Card number is required.")
+            elif not re.match(r'^\d{13,19}$', re.sub(r'\s', '', cleaned_data.get("card_number", ""))):
+                self.add_error("card_number", "Invalid card number.")
             if not cleaned_data.get("expiry_date"):
                 self.add_error("expiry_date", "Expiry date is required.")
+            elif not re.match(r'^(0[1-9]|1[0-2])/\d{2}$', cleaned_data.get("expiry_date", "")):
+                self.add_error("expiry_date", "Invalid expiry date format (MM/YY).")
             if not cleaned_data.get("cvv"):
                 self.add_error("cvv", "CVV is required.")
-        elif method == "paypal":
-            if not cleaned_data.get("paypal_email"):
-                self.add_error("paypal_email", "PayPal email is required.")
+            elif not re.match(r'^\d{3,4}$', cleaned_data.get("cvv", "")):
+                self.add_error("cvv", "Invalid CVV.")
         # COD requires no extra fields
         return cleaned_data

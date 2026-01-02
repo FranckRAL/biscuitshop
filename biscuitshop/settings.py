@@ -179,4 +179,4 @@ MVOLA_PARTNER_NAME = env('MVOLA_PARTNER_NAME')
 MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_ACCESS_TOKEN_ENDPOINT')
 MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
 # Mvola API scopes - request the correct scope for merchant pay operations
-MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay')
+MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay') #type: ignore

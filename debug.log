@@ -1,60 +1,60 @@
-
-Order 32 created with payment method mvola and phone 0343195313
+Order 46 created with payment method mvola and phone 0343500003
 [Mvola] API URL: https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0
-[Mvola] Partner MSISDN: 0349564606
-[Mvola] Partner Name: Biscuitshop
-[Mvola] Customer Phone: 0343195313
-[Mvola] Token URL: https://developer.mvola.mg/oauth2/token
-[Mvola] Token endpoint auth credentials - Client ID: TH_ar67WMugEFCWPDd7y75sjq8Ea
-[Mvola] Requesting scope: EXT_INT_MVOLA_SCOPE
-[Mvola] Token response status: 200
-[Mvola] Token response headers: {'Date': 'Fri, 26 Dec 2025 05:31:00 GMT', 'Content-Type': 'application/json', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'X-Frame-Options': 'DENY', 'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'no-store', 'Pragma': 'no-cache', 'Server': 'cloudflare', 'cf-cache-status': 'DYNAMIC', 'Content-Encoding': 'gzip', 'CF-RAY': '9b3e307eec557393-JNB'}
-[Mvola] Token response body: {"access_token":"eyJ4NXQiOiJaREUzWW1RNFkyRmtZekprTmpNMk5EVmtZVE5oTkRSak16azFObVEyWXprelkyUTFaVFZqWVEiLCJraWQiOiJNVGRsTXpneFpqZGtNakk0WmpKbVlUZ3dNRFJpWWpNMU1tUmhOamxoTUdNME1XTmtPV05tT1RobU16VXlNMlUxTkR
-[Mvola] New token obtained and cached
-[Mvola] Token preview: eyJ4NXQiOiJaREUzWW1R...
-[Mvola] payment headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer eyJ4NXQiOiJaREUzWW1RNFkyRmtZekprTmpNMk5EVmtZVE5oTkRSak16azFObVEyWXprelkyUTFaVFZqWVEiLCJraWQiOiJNVGRsTXpneFpqZGtNakk0WmpKbVlUZ3dNRFJpWWpNMU1tUmhOamxoTUdNME1XTmtPV05tT1RobU16VXlNMlUxTkRZNE5UWXhOMk01TW1SbU5XUTRPQV9SUzI1NiIsInR5cCI6ImF0K2p3dCIsImFsZyI6IlJTMjU2In0.eyJzdWIiOiJhbmRyeS50aW5hMTNAZ21haWwuY29tIiwiYXV0IjoiQVBQTElDQVRJT04iLCJhdWQiOiJUSF9hcjY3V011Z0VGQ1dQRGQ3eTc1c2pxOEVhIiwibmJmIjoxNzY2NzI3MDYwLCJhenAiOiJUSF9hcjY3V011Z0VGQ1dQRGQ3eTc1c2pxOEVhIiwic2NvcGUiOiJFWFRfSU5UX01WT0xBX1NDT1BFIiwiaXNzIjoiaHR0cHM6XC9cL2RldmVsb3Blci5tdm9sYS5tZ1wvb2F1dGgyXC90b2tlbiIsInJlYWxtIjp7InNpZ25pbmdfdGVuYW50IjoiY2FyYm9uLnN1cGVyIn0sImV4cCI6MTc2NjczMDY2MCwiaWF0IjoxNzY2NzI3MDYwLCJqdGkiOiI2YjVlMmExZS03Y2ViLTQ0MTMtOWI1Ni1lMDM1YjhkY2M4YWMifQ.hRuUWhMxYJaXSwzyMzdTizmicnzO_JS9eB_YZKeb-ZvAUDx_nOwo1SnJPqg15XYafRsdjkkajfc7k35-zXlIFrXvvaLuyywxlGQBM-75C7vHi840BuzQQpGPqrpCNNdKbDOqKTSPrCI0qTKoSPdsct2MYlCCjy7mX4ziEv5fJcvoex6ktWY1CAj-4fQerHIxjqZRLQsQ-U6g0BME7_rWj7aZAL5UFq8Kkc0Zq-JSQnqnYnWGEslABUTNKoCKICephSzC4A5me74b9Na9Vnov_chmiPRLmVm31akt6SijzAB7fIRNR0lJWun5n9tShWfk4m3z-2tNNcNBnHWDyo7vJQ', 'Version': '1.0', 'X-CorrelationID': '150a6ccf-a73a-45ec-94f5-779406a82332', 'userLanguage': 'MG', 'partnerName': 'Biscuitshop', 'UseraccountIdentifier': 'msisdn;0349564606', 'Cache-Control': 'no-cache'} 
-[Mvola] Request payload: {
-  "amount": "1038",
-  "currency": "Ar",
-  "descriptionText": "Order 32",
-  "requestDate": "2025-12-26T05:30:58.000Z",
-  "debitParty": [
-    {
-      "key": "msisdn",
-      "value": "0343195313"
-    }
-  ],
-  "creditParty": [
-    {
-      "key": "msisdn",
-      "value": "0349564606"
-    }
-  ],
-  "metadata": [
-    {
-      "key": "partnerName",
-      "value": "Biscuitshop"
-    }
-  ],
-  "requestingOrganisationTransactionReference": "ORDER-32-7f116205"
-}
-[Mvola] Initiating payment for order 32 to https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0
-[Mvola] Response status: 500
-[Mvola] Response headers: {'Date': 'Fri, 26 Dec 2025 05:31:01 GMT', 'Content-Type': 'application/json; charset=UTF-8', 'Transfer-Encoding': 'chunked', 'Connection': 'keep-alive', 'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'POST', 'X-Content-Type-Options': 'nosniff', 'Access-Control-Allow-Headers': 'authorization,Access-Control-Allow-Origin,Content-Type,SOAPAction,apikey,Cache-Control,CellIdA,GeoLocationA,CellIdB,GeoLocationB,Version,X-CorrelationID,X-Callback-URL,Useraccountidentifier,partnerName,UserLanguage,Authorization', 'X-Frame-Options': 'DENY', 'activityid': '61eff393-6723-485a-b706-e8f7b7f73ee3', 'Access-Control-Expose-Headers': '', 'Strict-Transport-Security': 'max-age=31536000 ; includeSubDomains', 'Cache-Control': 'private', 'Set-Cookie': 'sugijoypjtst=!eNLfjxpn5Kf0huxUEnAU/cW9v5E9Qb3Otw7ZGgO0LovmmwfU77Fb9UXUndAA83og89m4DodUXaM8lNc=; path=/; Httponly; Secure', 'Vary': 'Access-Control-Request-Headers, Access-Control-Request-Method, Origin', 'X-XSS-Protection': '1; mode=block', 'cf-cache-status': 'DYNAMIC', 'Server': 'cloudflare', 'CF-RAY': '9b3e3085abee9863-JNB'}
-[Mvola] Response body: {
-        "errorCategory":"internal",
-        "errorCode":"genericError",
-        "errorDescription":"Error in getting user language",
-        "errorDateTime":"2025-12-26T08:31:01.712Z",
-        "errorParameters":[
-            {
-                "key":"mmErrorCode",
-                "value":"4002"
-            }
-        ]
-        }
-[Mvola] API request failed for order 32: 500 Server Error: Internal Server Error for url: https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0
-[Mvola] Full error details: No response
-No transaction reference for order 32
-Payment status check for order 32: pending
-Payment pending for order 32
+[Mvola] Using cached token
+[Mvola] Initiating payment for order 46
+[Mvola] Response status: 202
+[Mvola] Payment initiated for order 46: status=pending
+[Payment] Payment initiated for order 46
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: pending
+[Mvola] Using cached token
+[Mvola] Checking status for order 46
+[Mvola] Status response: 200
+[Mvola] Order 46 mvola_status: failed
+[Mvola] Order 46 marked as failed

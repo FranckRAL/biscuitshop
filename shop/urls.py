@@ -23,9 +23,11 @@ urlpatterns = [
     
     
     path('checkout/', views.checkout_view, name='checkout'),
-    path('payment/<int:order_id>/', views.process_payment, name='process_payment'),
-    path('payment/<int:order_id>/confirm/', views.confirm_payment, name='confirm_payment'),
-    path('order-success/<int:order_id>/', views.order_success, name='order_success'),
+    path('payment/<int:order_id>/process/', views.process_payment, name='process_payment'),
+    path('payment/<int:order_id>/waiting/', views.order_waiting, name='order_waiting'),
+    path('payment/<int:order_id>/check-status/', views.check_payment_status, name='check_payment_status'),
+    path('payment/<int:order_id>/success/', views.order_success, name='order_success'),
+    
     path('mvola/callback/', views.mvola_callback, name='mvola_callback')
     
     

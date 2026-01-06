@@ -2,33 +2,36 @@
 {% load static %} 
 {% block title %}Home - BiscuitShop{% endblock %} 
 {% block content %}
-<div class="container mx-auto p-4 h-screen">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-    <div class="text-center">
-      <h1 class="text-blue-500 text-5xl quicksand-bold">
+<section class="py-12 lg:py-20">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+    <article class="text-center lg:text-left">
+      <h1 class="text-3xl sm:text-4xl lg:text-5xl text-blue-600 quicksand-bold mb-4">
         Welcome to Biscuit'tsika!
       </h1>
-      <p class="mb-4 text-gray-700">
+      <p class="text-gray-700 text-base sm:text-lg mb-6 leading-relaxed">
         Your one-stop shop for delicious biscuits and treats.
       </p>
       <a
         href="{% url 'product-list' %}"
-        class="primary-btn"
-        >Browse Products</a
+        class="primary-btn inline-block"
       >
-    </div>
-    <div class="h-full flex items-center justify-center overflow-hidden">
+        <i class="bi bi-shop"></i> Browse Products
+      </a>
+    </article>
+    
+    <div class="flex items-center justify-center overflow-hidden rounded-lg shadow-lg">
       <img
         id="main_image"
         src="{% static 'images/biscuit1.jpg' %}"
         alt="Delicious Biscuits"
-        class="mx-auto rounded-lg shadow-lg"
+        class="w-full h-auto max-h-96 object-cover"
         loading="lazy"
         data-url="{% static 'images/biscuit1.jpg' %}"
       />
     </div>
   </div>
-  <div class="flex items-center justify-center mt-8 gap-6">
+  
+  <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-10 lg:mt-14">
     <img
       id="image_1"
       src="{% static 'images/biscuit1_thumbnail.jpg' %}"
@@ -54,7 +57,7 @@
       data-url="{% static 'images/biscuit_3.jpg' %}"
     />
   </div>
-</div>
+</section>
 
 {% endblock %} {% block extra_js %}
 <script src="{% static 'js/utils.js' %}"></script>

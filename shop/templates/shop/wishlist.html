@@ -9,68 +9,74 @@
         {% csrf_token %}
     </div>
 
-    <div id="product-detail-overlay">
-        <div class="product-details-modal ">
-            <button id="close-modal" class="close-modal-btn">
+    <!-- Product Details Modal -->
+    <div id="product-detail-overlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden z-60 flex items-center justify-center">
+        <dialog class="product-details-modal max-w-lg w-11/12 sm:w-full bg-white rounded-lg shadow-lg p-6 relative max-h-[90vh] overflow-y-auto">
+            <button id="close-modal" class="close-modal-btn absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition" aria-label="Close">
                 <i class="bi bi-x-lg text-2xl"></i>
             </button>
             <div id="product-details-content">
                 <!-- Product details will be loaded here via AJAX -->
-                 <div>
+                <div>
                     <h2 class="text-2xl font-bold mb-4">Loading...</h2>
                     <p class="text-gray-600">Please wait while we load the product details.</p>
-                 </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="container mx-auto p-4">
-        <div class="banner ">
-            <h1 class="page-title quicksand-bold">Favorites Products</h1>
-            <p class="mb-4 text-blue-100">Your favorites products are listed below.</p>
-        </div>
-        {% if wishlist_products %}
-                <ul class="biscuit-list-container">
-                    {% for product in wishlist_products %}
-                        <li class="product-card" data-detail-url="{% url 'product-detail' product.id %}">
-                            <div class=" mb-2 relative">
-                                <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card-img" loading="lazy">
-                                <button class="favorite-btn"
-                                    data-url="{% url 'toggle-favorite' product.id %}"
-                                    data-product-id="{{ product.id }}"
-                                    title="Remove from wishlist">
-                                    <i class="bi bi-heart-fill text-red-500"></i>
-                                </button>
-                            </div>
-                            <div class="p-4">
-                                <h2 class="card-title quicksand-normal">{{ product.name }}</h2>
-                                <p class="card-description">{{ product.description|truncatewords:10 }}</p>
-                                <p class="card-price">${{ product.price }}</p>
-                                <hr class="my-2">
-                                <div class="flex gap-2">
-                                    <button  
-                                        class="add-cart-btn primary-btn"
-                                        data-url="{% url 'add-to-cart' product.id %}"
-                                        aria-label="Add {{ product.name }} to cart"
-                                    >
-                                        <i class="bi bi-cart-plus"></i> Add to Cart
-                                    </button>
-                                </div>
-                            </div>
-                        </li>
-                    {% endfor %}
-                </ul>
-        {% else %}
-            <div class="flex justify-center items-center mt-10 h-96">
-                <div class="text-center">
-                    <i class="bi bi-heart text-gray-300 text-6xl mb-4"></i>
-                    <p class="text-gray-600 text-lg">You have no favorite products yet. Browse our 
-                        <a href="{% url 'product-list' %}" class="text-blue-600 hover:underline font-semibold">shop</a> to add some!
-                    </p>
                 </div>
             </div>
-        {% endif %}
+        </dialog>
     </div>
+
+    <section class="py-4">
+        <!-- Banner -->
+        <div class="banner text-white rounded-lg shadow-lg mb-8 py-12 px-4 text-center">
+            <h1 class="page-title text-3xl sm:text-4xl lg:text-5xl quicksand-bold mb-3">Your Favorite Products</h1>
+            <p class="text-blue-100 text-sm sm:text-base">Your collection of favorite items is displayed below.</p>
+        </div>
+
+        {% if wishlist_products %}
+            <!-- Wishlist Grid -->
+            <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" role="list">
+                {% for product in wishlist_products %}
+                    <li class="product-card h-full border border-gray-300 rounded shadow-lg hover:shadow-xl transition" data-detail-url="{% url 'product-detail' product.id %}">
+                        <div class="relative overflow-hidden rounded-t">
+                            <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card-img w-full h-48 object-cover" loading="lazy">
+                            <button class="favorite-btn absolute top-2 right-2 bg-black/30 p-2 rounded-full shadow hover:bg-black/40 transition"
+                                data-url="{% url 'toggle-favorite' product.id %}"
+                                data-product-id="{{ product.id }}"
+                                title="Remove from wishlist"
+                                aria-label="Remove {{ product.name }} from wishlist">
+                                <i class="bi bi-heart-fill text-red-500"></i>
+                            </button>
+                        </div>
+                        <div class="p-4 flex flex-col h-full">
+                            <h2 class="card-title text-lg font-semibold mb-2 text-gray-700 cursor-pointer hover:text-blue-600 transition">{{ product.name }}</h2>
+                            <p class="card-description text-gray-600 text-sm mb-2 flex-grow">{{ product.description | truncatewords:15 }}</p>
+                            <p class="card-price text-green-600 font-bold text-lg mb-3">Ar {{ product.price }}</p>
+                            <hr class="my-2 text-gray-200">
+                            <div class="mt-auto">
+                                <button  
+                                    class="primary-btn w-full text-center justify-center flex items-center gap-2 add-cart-btn transition"
+                                    data-url="{% url 'add-to-cart' product.id %}"
+                                    aria-label="Add {{ product.name }} to cart">
+                                    <i class="bi bi-cart-plus"></i> <span class="text-sm sm:text-base">Add</span>
+                                </button>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+            </ul>
+
+        {% else %}
+            <!-- Empty Wishlist State -->
+            <div class="flex flex-col items-center justify-center py-16 px-4">
+                <i class="bi bi-heart text-6xl text-gray-300 mb-4"></i>
+                <p class="text-lg sm:text-xl text-gray-600 text-center mb-2">You have no favorite products yet.</p>
+                <p class="text-sm text-gray-500 text-center mb-6">Browse our shop to add some favorites!</p>
+                <a href="{% url 'product-list' %}" class="primary-btn inline-block">
+                    <i class="bi bi-shop"></i> Browse Shop
+                </a>
+            </div>
+        {% endif %}
+    </section>
 {% endblock %}
 
 {% block extra_js %}

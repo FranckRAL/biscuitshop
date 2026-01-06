@@ -58,3 +58,10 @@ function displayMessage(message, status) {
     });
   }, 3000);
 }
+
+/*profile visibility toggle*/
+$(function(){
+  $("#profile-icon").on("click", function(){
+    $("#profile-menu").toggleClass("hidden");
+  });
+})

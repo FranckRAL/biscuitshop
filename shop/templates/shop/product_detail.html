@@ -2,9 +2,9 @@
 {% if product %}
 <div class="product-card border border-gray-300 rounded shadow-lg w-full" data-detail-url="{% url 'product-detail' product.id %}">
   <div class="product-image mb-2 relative">
-    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-48 object-cover rounded" loading="lazy" />
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-card-img" loading="lazy" />
     <button
-      class="favorite-btn absolute top-2 right-2 bg-[rgba(0,0,0,0.3)] p-2 rounded-full shadow hover:bg-[rgba(0,0,0,0.5)] cursor-pointer"
+      class="favorite-btn"
       data-url="{% url 'toggle-favorite' product.id %}"
       data-product-id="{{ product.id }}"
     >
@@ -16,13 +16,13 @@
     </button>
   </div>
   <div class="p-4">
-    <h3 class="text-lg font-semibold mb-2 text-gray-700">{{ product.name }}</h3>
-    <p class="text-gray-600">{{ product.description }}</p>
-    <p class="text-green-600 font-bold">${{ product.price }}</p>
+    <h2 class="card-title">{{ product.name }}</h2>
+    <p class="card-description">{{ product.description }}</p>
+    <p class="card-price">${{ product.price }}</p>
     <hr class="my-2 text-gray-500" />
     <div class="flex justify-center items-center">
       <button
-        class="add-cart-btn mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 cursor-pointer"
+        class="add-cart-btn primary-btn"
         data-url="{% url 'add-to-cart' product.id %}"
         aria-label="Add {{ product.name }} to cart"
       >

@@ -5,10 +5,7 @@ from django.conf import settings
 from django.urls import reverse
 import uuid
 import requests
-import json
 import logging
-import hashlib
-import hmac
 
 logger = logging.getLogger(__name__)
 

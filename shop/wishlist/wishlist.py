@@ -1,4 +1,7 @@
 from shop.models import Product, WishlistItem
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Wishlist:
@@ -29,25 +32,19 @@ class Wishlist:
             self.wishlist.append(product_id)
             print('Added to wishlist successfully! | session user')
             self.save()
-            
+
     def remove(self, product_id):
         """Remove product from wishlist"""
-        product_id = int(product_id)  # Ensure string for consistency
-        print('self.is_authenticated at wishlist remove:', self.is_authenticated)
-        print('product_id:', product_id,' and type:', type(product_id))
-        print( 'self.wishlist:', self.wishlist, 'and type: ', type(self.wishlist))
+        product_id = str(product_id)
         
         if product_id in self.wishlist:
             self.wishlist.remove(product_id)
-            print('Removed from wishlist successfully! | session user')
             if self.is_authenticated:
                 try:
                     product = Product.objects.get(id=product_id)
                     WishlistItem.objects.filter(user=self.request.user, product=product).delete()
-                    print('Removed from wishlist successfully! | authenticated user')
                 except Exception as e:
-                    print('Error removing from wishlist:', e)
-            print('self.wishlist at wishlist remove:', self.wishlist, 'product_id:', product_id)
+                    logger.error('Error removing from wishlist frome the database: %s', e)
             
         self.save()
     
@@ -94,7 +91,7 @@ class Wishlist:
         products = Product.objects.filter(id__in=self.wishlist)
         for product in products:
             yield product
-            
+
     def _sync_wishlist_session_and_db(self):
         """Sync wishlist between session and database"""
         if not self.is_authenticated:

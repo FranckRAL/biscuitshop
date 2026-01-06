@@ -1,3 +1,6 @@
+@import url("https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Oxygen:wght@300;400;700&display=swap");
+
 @import "tailwindcss";
 
 /**
@@ -8,3 +11,169 @@
   * the scope of this path.
   */
 @source "../../../**/*.{html,py,js}";
+
+/* Custom Font Utilities */
+@layer utilities {
+  
+}
+
+@layer components {
+  .thumbnail-img {
+    @apply rounded-lg shadow-lg object-contain w-28 cursor-pointer transition-all duration-200;
+  }
+
+  .primary-btn {
+    @apply bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition duration-200;
+  }
+
+  .secondary-btn {
+    @apply bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition duration-200;
+  }
+
+  .page-title {
+    @apply text-4xl text-white font-bold mb-4;
+  }
+
+  /* product page components */
+  #product-detail-overlay {
+    @apply fixed top-0 left-0 right-0 bottom-0 w-full h-full bg-[rgba(0,0,0,0.5)] backdrop-blur-[5px] z-60 hidden;
+  }
+
+  .product-details-modal {
+    @apply bg-white rounded-lg shadow-lg p-6 max-w-lg mx-auto mt-20 relative;
+  }
+
+  .close-modal-btn {
+    @apply absolute top-2 right-2 text-gray-500 hover:text-gray-700 cursor-pointer z-50;
+  }
+
+  .banner {
+    @apply text-center mb-6 flex flex-col justify-center items-center h-80 bg-linear-to-r from-gray-800 via-blue-700 to-gray-900 rounded shadow-lg;
+  }
+
+  .product-list-container {
+    @apply flex flex-wrap gap-4 w-screen items-center justify-center;
+  }
+
+  .product-card {
+    @apply hover:scale-105 transition-all duration-200 border border-gray-300  rounded shadow-lg w-1/5;
+  }
+
+  .product-card-img {
+    @apply w-full h-48 object-cover rounded cursor-pointer;
+  }
+
+  .favorite-btn {
+    @apply absolute top-2 right-2 bg-[rgba(0,0,0,0.3)] p-2 rounded-full shadow hover:bg-[rgba(0,0,0,0.3)]  cursor-pointer;
+  }
+
+  .card-title {
+    @apply text-lg font-semibold mb-2 text-gray-700 cursor-pointer;
+  }
+
+  .card-description {
+    @apply text-gray-600;
+  }
+
+  .card-price {
+    @apply text-green-600 font-bold;
+  }
+
+  .pagination {
+    @apply mt-6 flex justify-center items-center gap-2;
+  }
+
+  .pagination-btn {
+    @apply px-3 py-1 bg-gray-300 rounded hover:bg-gray-400;
+  }
+
+  
+}
+
+@layer base {
+  /* Main page style */
+  body {
+    @apply bg-yellow-50 min-h-screen flex flex-col relative ;
+  }
+  
+  .active {
+    @apply border-2 border-blue-500;
+  }
+  .header {
+    @apply bg-yellow-200 border border-b border-yellow-300 py-4 px-14 sticky top-0 z-50 shadow-md;
+  }
+
+  nav {
+    @apply container mt-2 flex items-center justify-between mx-auto;
+  }
+
+  .nav-brand {
+    @apply font-bold text-xl;
+  }
+
+  .nav-link {
+    @apply text-blue-600 hover:underline;
+  }
+
+  .nav-items {
+    @apply relative hover:scale-110 transition-all duration-200;
+  }
+
+  .badge {
+    @apply absolute -top-2 -right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full;
+  }
+
+  .user-logo-btn {
+    @apply text-blue-500 px-2 py-1 rounded-full hover:scale-110 transition duration-200  cursor-pointer;
+  }
+
+  .user-menu {
+    @apply absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg  group-hover:block  duration-200;
+  }
+
+  footer {
+    @apply bg-yellow-200 border border-t border-yellow-300 p-4 text-center;
+  }
+
+  /* Homepage style */
+  .quicksand-light {
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  .quicksand-normal {
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .quicksand-bold {
+    font-family: "Quicksand", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    font-style: normal;
+  }
+
+  .oxygen-light {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+  }
+
+  .oxygen-regular {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+
+  .oxygen-bold {
+    font-family: "Oxygen", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+}
+
+

@@ -3,3 +3,13 @@ Not Found: /.well-known/appspecific/com.chrome.devtools.json
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
 Not Found: /.well-known/appspecific/com.chrome.devtools.json
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+Not Found: /.well-known/appspecific/com.chrome.devtools.json
+Order 47 created with payment method mvola and phone 0343500003
+[Mvola] API URL: https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0
+[Mvola] Requesting new token
+[Mvola] New token obtained and cached
+[Mvola] Initiating payment for order 47
+[Mvola] Response status: 500
+[Mvola] API request failed: 500 Server Error: Internal Server Error for url: https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0
+[Payment] Error initiating mvola: 500 Server Error: Internal Server Error for url: https://devapi.mvola.mg/mvola/mm/transactions/type/merchantpay/1.0.0

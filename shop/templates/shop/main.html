@@ -16,22 +16,29 @@
     {% tailwind_css %}
 </head>
 
-<body class="bg-gray-100 oxygen-regular">
-    <header class="header">
-        <nav class="nav">
-            <p class="nav-brand"><a href="{% url 'home' %}" class="text-blue-600">Biscuit'tsika</a></p>
-            <div class="flex items-center gap-4">
-                <a href="{% url 'product-list' %}" class="nav-link">Shop</a>
-                <a href="{% url 'cart' %}" class="nav-items">
-                    <i class="bi bi-cart3 text-xl text-blue-600"></i>
+<body class="bg-yellow-50 min-h-screen flex flex-col oxygen-regular">
+    <header class="header sticky top-0 z-50">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between">
+            <div class="flex-shrink-0">
+                <h1 class="text-2xl sm:text-3xl font-bold"><a href="{% url 'home' %}" class="text-blue-600 hover:text-blue-700 transition">Biscuit'tsika</a></h1>
+            </div>
+            
+            <div class="hidden sm:flex items-center gap-6">
+                <a href="{% url 'product-list' %}" class="text-blue-600 hover:underline text-sm sm:text-base transition">Shop</a>
+            </div>
+            
+            <div class="flex items-center gap-2 sm:gap-6">
+                <a href="{% url 'cart' %}" class="nav-items relative text-blue-600 hover:text-blue-700 transition">
+                    <i class="bi bi-cart3 text-xl"></i>
                     {% if cart_count > 0 %}
                     <span id="cart-count" class="badge">
                         {{ cart_count }}
                     </span>
                     {% endif %}
                 </a>
-                <a href="{% url 'wishlist' %}" class="nav-items">
-                    <i class="bi bi-heart text-xl text-blue-600"></i>
+                
+                <a href="{% url 'wishlist' %}" class="nav-items relative text-blue-600 hover:text-blue-700 transition">
+                    <i class="bi bi-heart text-xl"></i>
                     {% if wishlist_count > 0 %}
                     <span id="wishlist-count" class="badge">
                         {{ wishlist_count }}
@@ -40,22 +47,23 @@
                 </a>
                 
                 {% if request.user.is_authenticated %}
-                
-                <div class="items-center gap-2 flex relative">
-                    <button id="profile-icon" class="user-logo-btn">
+                <div class="relative group">
+                    <button id="profile-icon" class="user-logo-btn text-blue-600 hover:text-blue-700 transition">
                         <i class="bi bi-person-circle text-xl"></i>
                     </button>
-                    <div id="profile-menu" class="user-menu hidden">
+                    <div id="profile-menu" class="user-menu hidden absolute top-full right-0 mt-2 w-48 bg-white border border-gray-300 rounded shadow-lg">
                         <ul class="p-4 border-b border-gray-200">
-                            <li class="text-center"><span class="text-gray-500"><i class="bi bi-person-circle text-xl w-20"></i></span></li>
-                            <li class="text-center"><span class="text-gray-700 ">{{request.user.username | title}}</span></li>
-                            <li class="text-center"><span class="text-gray-500 ">{{request.user.email}}</span></li>
+                            <li class="text-center mb-2"><i class="bi bi-person-circle text-4xl text-gray-500"></i></li>
+                            <li class="text-center mb-1"><span class="text-gray-700 font-semibold block">{{request.user.username | title}}</span></li>
+                            <li class="text-center"><span class="text-gray-500 text-sm block">{{request.user.email}}</span></li>
                         </ul>
-                        <p class="flex justify-center items-center"><a href="{% url 'logout' %}" class="text-blue-500  py-2">Logout</a></p>
+                        <div class="p-2 text-center">
+                            <a href="{% url 'logout' %}" class="text-blue-600 hover:text-blue-700 py-2 block text-sm transition">Logout</a>
+                        </div>
                     </div>
                 </div>
                 {% else %}
-                <a href="{% url 'login' %}" class="user-logo-btn">
+                <a href="{% url 'login' %}" class="user-logo-btn text-blue-600 hover:text-blue-700 transition">
                     <i class="bi bi-person-circle text-xl"></i>
                 </a>
                 {% endif %}
@@ -63,13 +71,17 @@
         </nav>
     </header>
 
-    <main class="w-full max-w-7xl mx-auto p-4">
-        {% block content %}
-        {% endblock %}
+    <main class="flex-grow w-full">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+            {% block content %}
+            {% endblock %}
+        </div>
     </main>
 
-    <footer>
-        <p class="text-gray-700">&copy; 2024 Biscuit Shop. All rights reserved.</p>
+    <footer class="bg-yellow-200 border-t border-yellow-300 py-6 px-4 mt-auto">
+        <div class="max-w-7xl mx-auto text-center text-gray-700">
+            <p>&copy; 2024 Biscuit Shop. All rights reserved.</p>
+        </div>
     </footer>
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

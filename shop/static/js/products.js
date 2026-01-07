@@ -52,7 +52,7 @@ $(document).ready(function() {
     });
 
     // Product detail modal
-    $(document).on('click', '.product-card img, .product-card h3', function(e) {
+    $(document).on('click', '.product-card img, .product-card h2', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
@@ -77,8 +77,8 @@ $(document).ready(function() {
                     var contentDiv = $('#product-details-content');
                     contentDiv.html(response.html);
                     
-                    var overlay = $('#product-detail-overlay');
-                    overlay.removeClass('hidden');
+                    $('#product-details-modal')[0].showModal();
+
                 } else {
                     alert('Error loading product details: Invalid response');
                 }
@@ -91,6 +91,6 @@ $(document).ready(function() {
 
     // Close modal
     $(document).on('click', '#close-modal', function() {
-        $('#product-detail-overlay').addClass('hidden');
+        $('#product-details-modal')[0].close();
     });
 });

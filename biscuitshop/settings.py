@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'shop.apps.ShopConfig',
     'tailwind',
+    'easy_thumbnails',
     'theme.apps.ThemeConfig',  
 ]
 
@@ -96,6 +97,14 @@ LOGGING = {
             'level': 'DEBUG',
             'propagate': False,
         },
+    },
+}
+
+# thumbnail creators
+THUMBNAIL_ALIASES = {
+    '': {
+        'card_img': {'size': (200, 150), 'crop': True, 'quality': 80},
+        'card_detail_img': {'size': (400, 300), 'crop': True, 'quality': 80},
     },
 }
 

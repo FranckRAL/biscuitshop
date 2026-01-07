@@ -1,8 +1,10 @@
 {% load static %}
+{% load thumbnail %}
 {% if product %}
 <article class="bg-white rounded-lg shadow-lg overflow-hidden max-w-lg w-full h-full flex flex-col" data-detail-url="{% url 'product-detail' product.id %}">
   <div class="relative overflow-hidden bg-gray-200 aspect-square">
-    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="w-full h-full object-cover" loading="lazy" />
+    {% thumbnail product.image "card_detail_img" as thumb %}
+      <img src="{{ thumb.url}}" alt="{{ product.name }}" class="w-full h-full object-cover" loading="lazy" />
     <button
       class="favorite-btn absolute top-2 right-2 bg-black/30 p-2 rounded-full shadow hover:bg-black/40 transition"
       data-url="{% url 'toggle-favorite' product.id %}"

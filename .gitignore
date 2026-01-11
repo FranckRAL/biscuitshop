@@ -3,5 +3,3 @@ __pycache__/
 .env
 debug.log
 db.sqlite3
-/staticfiles/
-media/

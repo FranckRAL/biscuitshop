@@ -21,6 +21,9 @@ class Product(models.Model):
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     stock = models.PositiveIntegerField(default=0)
     image = models.ImageField(upload_to='products/', blank=True, null=True)
+    
+    def get_absolute_url(self):
+        return reverse('product-detail', args=[self.id]) #type: ignore
 
     def __str__(self):
         return self.name

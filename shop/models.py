@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from decimal import Decimal
+from cloudinary.models import CloudinaryField
 
 #Category model to classify biscuits
 class Category(models.Model):
@@ -20,7 +20,7 @@ class Product(models.Model):
     price = models.DecimalField(max_digits=6, decimal_places=2)
     category = models.ForeignKey(Category, related_name='products', on_delete=models.CASCADE)
     stock = models.PositiveIntegerField(default=0)
-    image = models.ImageField(upload_to='products/', blank=True, null=True)
+    image = CloudinaryField('image', blank=True, null=True)
     
     def get_absolute_url(self):
         return reverse('product-detail', args=[self.id]) #type: ignore

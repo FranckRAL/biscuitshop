@@ -1,6 +1,6 @@
 {% extends "shop/main.html" %}
 {% load static %}
-{% load thumbnail %}
+{% load cloudinary %}
 {% block title %}Products - Biscuit Shop{% endblock %}
 
 {% block content %}
@@ -41,8 +41,7 @@
                 {% for product in products %}
                     <li class="product-card" data-detail-url="{% url 'product-detail' product.id %}">
                         <div class="relative overflow-hidden rounded-t">
-                            {% thumbnail product.image "card_img" as thumb %}
-                            <img src="{{ thumb.url}}" alt="{{ product.name }}" class="w-full h-full object-cover cursor-pointer" loading="lazy" />
+                            <img src={{product.image.url}} alt={{product.name}} class="h-full w-full object-cover" loading="lazy" />
                             <button class="favorite-btn"
                                 data-url="{% url 'toggle-favorite' product.id %}"
                                 aria-label="Toggle favorite for {{product.name}}"
@@ -56,6 +55,7 @@
                         </div>
                         <div class="p-4 flex flex-col h-full">
                             <h2 class="card-title">{{ product.name }}</h2>
+                            <p>{{product.image.name}}</p>
                             <p class="card-description mb-2 flex-grow">{{ product.description | truncatewords:15 }}</p>
                             <p class="card-price mb-3">Ar {{ product.price }}</p>
                             <hr class="my-2 text-gray-200">

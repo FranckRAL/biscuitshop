@@ -1,6 +1,7 @@
 
 from pathlib import Path
 import environ
+import cloudinary
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -28,12 +29,14 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     'shop.apps.ShopConfig',
     'django.contrib.admin',
     'tailwind',
-    'easy_thumbnails',
-    'theme.apps.ThemeConfig',  
+    # 'easy_thumbnails',
+    'theme.apps.ThemeConfig',
+    'cloudinary', 
 ]
 
 MIDDLEWARE = [
@@ -100,13 +103,29 @@ LOGGING = {
     },
 }
 
-# thumbnail creators
-THUMBNAIL_ALIASES = {
-    '': {
-        'card_img': {'size': (200, 150), 'crop': True, 'quality': 80},
-        'card_detail_img': {'size': (400, 300), 'crop': True, 'quality': 80},
-    },
+
+#cloudinary config
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': env('CLOUDINARY_NAME'),
+    'API_KEY': env('CLOUDINARY_API_KEY'),
+    'API_SECRET': env('CLOUDINARY_API_SECRET'),
 }
+
+cloudinary.config(
+    cloud_name=CLOUDINARY_STORAGE['CLOUD_NAME'],
+    api_key=CLOUDINARY_STORAGE['API_KEY'],
+    api_secret=CLOUDINARY_STORAGE['API_SECRET'],
+)
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# # thumbnail creators
+# THUMBNAIL_ALIASES = {
+#     '': {
+#         'card_img': {'size': (200, 150), 'crop': True, 'quality': 80},
+#         'card_detail_img': {'size': (400, 300), 'crop': True, 'quality': 80},
+#     },
+# }
 
 
 WSGI_APPLICATION = 'biscuitshop.wsgi.application'

@@ -2,6 +2,7 @@
 from pathlib import Path
 import environ
 import cloudinary
+import dj_database_url
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -119,14 +120,6 @@ cloudinary.config(
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# # thumbnail creators
-# THUMBNAIL_ALIASES = {
-#     '': {
-#         'card_img': {'size': (200, 150), 'crop': True, 'quality': 80},
-#         'card_detail_img': {'size': (400, 300), 'crop': True, 'quality': 80},
-#     },
-# }
-
 
 WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 
@@ -135,10 +128,11 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': dj_database_url.config(
+        default=env('DATABASE_URL'), #type: ignore
+        conn_max_age=0,  # Important pour Neon : ferme la connexion à la fin de chaque requête
+        ssl_require=True
+    )
 }
 
 

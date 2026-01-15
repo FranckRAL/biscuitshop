@@ -19,9 +19,9 @@ environ.Env.read_env(env_file=Path.joinpath(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-1nnn(1fvc%@@92)=cmx8n=x!ca%^d$*49l4#5v8a*l=(n3z9v2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool('DEBUG', default=False)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
 
 # Application definition
 
@@ -202,3 +202,10 @@ MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_
 MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
 # Mvola API scopes - request the correct scope for merchant pay operations
 MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay') #type: ignore
+
+
+
+#django security
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False

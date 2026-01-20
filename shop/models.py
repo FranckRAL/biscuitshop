@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from cloudinary.models import CloudinaryField
+from django.urls import reverse
 
 #Category model to classify biscuits
 class Category(models.Model):
@@ -22,6 +23,9 @@ class Product(models.Model):
     stock = models.PositiveIntegerField(default=0)
     image = CloudinaryField('image', blank=True, null=True)
     
+    class Meta:
+        ordering = ['-id']
+    
     def get_absolute_url(self):
         return reverse('product-detail', args=[self.id]) #type: ignore
 
@@ -32,11 +36,10 @@ class CustomerProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     address = models.TextField(blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
-    #avatar = models.ImageField(upload_to='avatars/', blank=True, null=True)
 
     def __str__(self):
         return f"{self.user.username}'s profile"
-    
+
 class CartItem(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     session_key = models.CharField(max_length=40, null=True, blank=True)
@@ -92,3 +95,8 @@ class OrderItem(models.Model):
     
     def __str__(self):
         return f"Order item: {self.product} - order: {self.order}"
+    
+    def save(self, *args, **kwargs):
+        if not self.price:
+            self.price = self.product.price
+        super().save(*args, **kwargs)

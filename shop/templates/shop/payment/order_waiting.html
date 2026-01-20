@@ -61,72 +61,73 @@
 </section>
 
 <script>
-    const orderId = {{ order.id }};
     const checkStatusUrl = "{% url 'check_payment_status' order_id=order.id %}";
     let attempt = 0;
-    let maxAttempts = 60; // 5 minutes with 5-second intervals
-    let checkInterval = null;
-    
-    function checkPaymentStatus() {
+    const maxAttempts = 60;
+    let isFinished = false; // Drapeau pour arrêter proprement
+
+    function pollStatus() {
+        if (isFinished || attempt >= maxAttempts) return;
+
         attempt++;
-        document.getElementById('attempt').textContent = attempt;
-        
+        const attemptElement = document.getElementById('attempt');
+        if (attemptElement) attemptElement.textContent = attempt;
+
         fetch(checkStatusUrl)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
             .then(data => {
                 console.log('Payment status:', data);
-                
+
                 if (data.status === 'completed') {
-                    // Payment successful
-                    clearInterval(checkInterval);
-                    document.getElementById('status-message').textContent = 
-                        'Payment completed! Redirecting...';
-                    document.getElementById('status-message').className = 
-                        'text-green-600 text-lg font-semibold mb-6';
-                    document.querySelector('.animate-spin').innerHTML = '<i class="bi bi-check-circle text-4xl text-green-600"></i>';
-                    
-                    setTimeout(() => {
-                        window.location.href = data.redirect_url;
-                    }, 1500);
+                    isFinished = true;
+                    updateUI('success', 'Payment completed! Redirecting...', data.redirect_url);
                 } 
                 else if (data.status === 'failed') {
-                    // Payment failed
-                    clearInterval(checkInterval);
-                    document.getElementById('status-message').textContent = 
-                        'Payment failed. Please try again.';
-                    document.getElementById('status-message').className = 
-                        'text-red-600 text-lg font-semibold mb-6';
-                    document.querySelector('.animate-spin').innerHTML = '<i class="bi bi-x-circle text-4xl text-red-600"></i>';
-                    document.getElementById('progress-bar').className = 
-                        'bg-red-600 h-full rounded-full';
-                }
+                    isFinished = true;
+                    updateUI('error', 'Payment failed. Please try again.');
+                } 
                 else {
-                    // Still pending
-                    if (attempt >= maxAttempts) {
-                        clearInterval(checkInterval);
-                        document.getElementById('status-message').textContent = 
-                            'Payment is taking longer than expected. Please check your account.';
-                        document.getElementById('status-message').className = 
-                            'text-yellow-600 text-lg font-semibold mb-6';
+                    // Toujours en attente, on relance dans 5 secondes
+                    if (attempt < maxAttempts) {
+                        setTimeout(pollStatus, 5000);
+                    } else {
+                        updateUI('warning', 'Payment is taking longer than expected. Please check your account.');
                     }
                 }
             })
             .catch(error => {
-                console.error('Error checking status:', error);
-                document.getElementById('status-message').textContent = 
-                    'Error checking payment status. Retrying...';
-                document.getElementById('status-message').className = 
-                    'text-yellow-600 text-lg font-semibold mb-6';
+                console.error('Error:', error);
+                // En cas d'erreur réseau, on réessaie quand même après 5s
+                setTimeout(pollStatus, 5000);
             });
     }
-    
-    // Start checking immediately, then every 5 seconds
-    checkPaymentStatus();
-    checkInterval = setInterval(checkPaymentStatus, 5000);
-    
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', () => {
-        if (checkInterval) clearInterval(checkInterval);
-    });
+
+    // Fonction centralisée pour mettre à jour l'interface (plus propre)
+    function updateUI(type, message, redirectUrl = null) {
+        const msgEl = document.getElementById('status-message');
+        const spinner = document.querySelector('.animate-spin');
+        
+        msgEl.textContent = message;
+        
+        if (type === 'success') {
+            msgEl.className = 'text-green-600 text-lg font-semibold mb-6';
+            if (spinner) spinner.innerHTML = '<i class="bi bi-check-circle text-4xl text-green-600"></i>';
+            if (redirectUrl) setTimeout(() => window.location.href = redirectUrl, 1500);
+        } 
+        else if (type === 'error') {
+            msgEl.className = 'text-red-600 text-lg font-semibold mb-6';
+            if (spinner) spinner.innerHTML = '<i class="bi bi-x-circle text-4xl text-red-600"></i>';
+            const progress = document.getElementById('progress-bar');
+            if (progress) progress.className = 'bg-red-600 h-full rounded-full';
+        }
+        else if (type === 'warning') {
+            msgEl.className = 'text-yellow-600 text-lg font-semibold mb-6';
+        }
+    }
+
+    pollStatus();
 </script>
 {% endblock %}

@@ -22,15 +22,13 @@ class Wishlist:
             try:
                 product = Product.objects.get(id=product_id)
                 _ , created = WishlistItem.objects.get_or_create(user=self.request.user, product=product)
-                print('Added to wishlist successfully! | authenticated user')
                 if not created:
                     return
             except Exception as e:
-                print('Error adding to wishlist:', e)
+                logger.error('Error adding to wishlist in the database: %s', e)
             
         if product_id not in self.wishlist:
             self.wishlist.append(product_id)
-            print('Added to wishlist successfully! | session user')
             self.save()
 
     def remove(self, product_id):
@@ -55,7 +53,7 @@ class Wishlist:
                 product = Product.objects.get(id=int(product_id))
                 return WishlistItem.objects.filter(user=self.request.user, product=product).exists()
             except Exception as e:
-                print('Error checking wishlist:', e)
+                logger.error('Error checking wishlist in the database: %s', e)
                 return False
         
         return str(product_id) in self.wishlist

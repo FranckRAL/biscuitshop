@@ -344,7 +344,7 @@ def checkout_view(request):
             # Add items to order
             total = Decimal('0.00')
             for item in cart:
-                product = Product.objects.get(id=item["product_id"])
+                product = Product.objects.get(id=item['product_id'])
                 quantity = item["quantity"]
                 price = product.price
                 
@@ -533,4 +533,4 @@ def mvola_callback(request):
     except Exception as e:
         logger.error(f"[Mvola Callback] Error processing callback: {str(e)}", exc_info=True)
         return JsonResponse({"status": "error", "message": str(e)}, status=500)
-    
+

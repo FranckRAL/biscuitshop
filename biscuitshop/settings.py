@@ -19,9 +19,9 @@ environ.Env.read_env(env_file=Path.joinpath(BASE_DIR, '.env'))
 SECRET_KEY = 'django-insecure-1nnn(1fvc%@@92)=cmx8n=x!ca%^d$*49l4#5v8a*l=(n3z9v2'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool('DEBUG', default=False)
+DEBUG = env.bool('DEBUG', default=False) #type: ignore
 
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost'])
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost']) #type: ignore
 
 # Application definition
 
@@ -35,7 +35,6 @@ INSTALLED_APPS = [
     'shop.apps.ShopConfig',
     'django.contrib.admin',
     'tailwind',
-    # 'easy_thumbnails',
     'theme.apps.ThemeConfig',
     'cloudinary', 
 ]

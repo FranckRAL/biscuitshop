@@ -1,95 +1,112 @@
 {% extends 'shop/main.html' %}
 {% load static %}
 {% block content %}
-<section class="py-8 sm:py-12">
+<section class="py-12 sm:py-20 bg-amber-50/30">
     <div class="max-w-4xl mx-auto px-4">
-        <!-- Success Message -->
-        <div class="bg-green-50 border border-green-200 rounded-lg p-6 sm:p-8 mb-8 text-center">
-            <div class="flex justify-center mb-4">
-                <i class="bi bi-check-circle text-5xl text-green-600"></i>
+        
+        <div class="bg-white border border-amber-100 rounded-[3rem] p-8 sm:p-12 mb-10 text-center shadow-2xl shadow-amber-900/5 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-emerald-400 via-amber-400 to-emerald-400"></div>
+            
+            <div class="flex justify-center mb-6">
+                <div class="w-24 h-24 bg-emerald-50 rounded-full flex items-center justify-center border-8 border-white shadow-lg">
+                    <i class="bi bi-check-lg text-5xl text-emerald-500"></i>
+                </div>
             </div>
-            <h1 class="text-3xl sm:text-4xl font-bold text-green-600 mb-3">Order Confirmed!</h1>
-            <p class="text-gray-600 text-sm sm:text-base">Thank you for your purchase. Your order has been placed successfully.</p>
+            
+            <h1 class="text-4xl sm:text-5xl font-black text-amber-900 mb-4 italic quicksand-bold">Sweet Success!</h1>
+            <p class="text-amber-800/60 text-lg max-w-md mx-auto">
+                Your order has been received and is now being prepared with love in our atelier.
+            </p>
         </div>
         
-        <!-- Order Details -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <!-- Order Summary -->
-            <article class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-                <h2 class="text-2xl font-semibold mb-4 pb-4 border-b">Order Summary</h2>
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-gray-600 text-sm">Order ID</p>
-                        <p class="text-xl font-semibold text-blue-600">#{{ order.id }}</p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            
+            <article class="bg-white shadow-xl shadow-amber-900/5 rounded-[2.5rem] p-8 border border-amber-100">
+                <h2 class="text-xl font-bold mb-6 text-amber-900 flex items-center gap-2 pb-4 border-b border-amber-50 quicksand-bold">
+                    <i class="bi bi-receipt text-amber-600"></i> Order Details
+                </h2>
+                <div class="space-y-5">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-black text-amber-900/40 uppercase tracking-widest">Order ID</span>
+                        <span class="font-mono font-bold text-amber-600 bg-amber-50 px-3 py-1 rounded-lg">#{{ order.id }}</span>
                     </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Status</p>
-                        <p class="text-lg font-semibold text-green-600 uppercase">{{ order.status }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-black text-amber-900/40 uppercase tracking-widest">Status</span>
+                        <span class="text-xs font-black uppercase bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full">
+                             <i class="bi bi-dot"></i> {{ order.status }}
+                        </span>
                     </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Total Price</p>
-                        <p class="text-2xl font-bold text-green-600">Ar {{ order.total_price }}</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-xs font-black text-amber-900/40 uppercase tracking-widest">Payment</span>
+                        <span class="font-bold text-amber-900 italic">{{ order.payment_method|upper }}</span>
                     </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Payment Method</p>
-                        <p class="text-gray-700 font-medium">{{ order.payment_method|upper }}</p>
-                    </div>
-                    <div>
-                        <p class="text-gray-600 text-sm">Order Date</p>
-                        <p class="text-gray-700 font-medium">{{ order.created_at|date:"M d, Y H:i" }}</p>
+                    <div class="flex justify-between items-center pt-4 border-t border-amber-50">
+                        <span class="text-amber-900 font-bold">Amount Paid</span>
+                        <span class="text-2xl font-black text-amber-600 italic">Ar {{ order.total_price }}</span>
                     </div>
                 </div>
             </article>
             
-            <!-- Items in Order -->
-            <article class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-                <h2 class="text-2xl font-semibold mb-4 pb-4 border-b">Items Ordered</h2>
-                <ul class="space-y-4">
+            <article class="bg-white shadow-xl shadow-amber-900/5 rounded-[2.5rem] p-8 border border-amber-100">
+                <h2 class="text-xl font-bold mb-6 text-amber-900 flex items-center gap-2 pb-4 border-b border-amber-50 quicksand-bold">
+                    <i class="bi bi-box-seam text-amber-600"></i> Items Ordered
+                </h2>
+                <ul class="space-y-4 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                     {% for item in order.items.all %}
-                        <li class="flex justify-between items-start pb-4 border-b last:border-b-0">
-                            <div class="flex-grow">
-                                <p class="font-medium text-gray-800">{{ item.product.name }}</p>
-                                <p class="text-sm text-gray-500">Quantity: {{ item.quantity }}</p>
+                        <li class="flex justify-between items-center py-2 border-b border-amber-50 last:border-0">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 bg-amber-50 rounded-lg flex items-center justify-center font-bold text-amber-700 text-xs">
+                                    {{ item.quantity }}x
+                                </div>
+                                <p class="font-bold text-amber-900 text-sm">{{ item.product.name }}</p>
                             </div>
-                            <p class="font-semibold text-gray-800 ml-4">Ar {{ item.price }}</p>
+                            <p class="font-bold text-amber-700 text-sm italic">Ar {{ item.price }}</p>
                         </li>
                     {% empty %}
-                        <li class="text-gray-500 text-center py-4">No items in this order.</li>
+                        <li class="text-amber-800/40 text-center py-4 italic">No items found.</li>
                     {% endfor %}
                 </ul>
             </article>
         </div>
         
-        <!-- Next Steps -->
-        <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 sm:p-8 mb-8">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-                <i class="bi bi-info-circle"></i> What's Next?
+        <div class="bg-amber-900 text-amber-50 rounded-[2.5rem] p-8 sm:p-10 mb-12 shadow-2xl relative overflow-hidden">
+            <div class="absolute -right-10 -bottom-10 opacity-10">
+                <i class="bi bi-truck text-[12rem]"></i>
+            </div>
+            
+            <h3 class="text-xl font-bold mb-6 flex items-center gap-3 quicksand-bold">
+                <i class="bi bi-stars text-amber-400"></i> What happens now?
             </h3>
-            <ul class="space-y-3 text-gray-700">
-                <li class="flex items-start gap-3">
-                    <i class="bi bi-envelope-check text-blue-600 mt-1 flex-shrink-0"></i>
-                    <span class="text-sm sm:text-base">A confirmation email has been sent to <strong>{{ request.user.email }}</strong></span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="bi bi-truck text-blue-600 mt-1 flex-shrink-0"></i>
-                    <span class="text-sm sm:text-base">You will receive tracking information once your order ships</span>
-                </li>
-                <li class="flex items-start gap-3">
-                    <i class="bi bi-calendar-check text-blue-600 mt-1 flex-shrink-0"></i>
-                    <span class="text-sm sm:text-base">Estimated delivery: 5-7 business days</span>
-                </li>
-            </ul>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+                <div class="space-y-2">
+                    <div class="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center text-amber-400 font-black">1</div>
+                    <p class="text-sm">We've sent a receipt to <br><span class="text-amber-200 font-bold">{{ request.user.email }}</span></p>
+                </div>
+                <div class="space-y-2">
+                    <div class="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center text-amber-400 font-black">2</div>
+                    <p class="text-sm">Our bakers are preparing your order for the next shipment.</p>
+                </div>
+                <div class="space-y-2">
+                    <div class="w-8 h-8 bg-amber-800 rounded-full flex items-center justify-center text-amber-400 font-black">3</div>
+                    <p class="text-sm">Delivery expected within <br><span class="text-amber-200 font-bold italic">24 to 48 hours</span>.</p>
+                </div>
+            </div>
         </div>
         
-        <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-            <a href="{% url 'home' %}" class="primary-btn flex items-center justify-center gap-2 px-6 py-3 transition">
-                <i class="bi bi-house"></i> <span class="text-sm sm:text-base">Back to Home</span>
+        <div class="flex flex-col sm:flex-row gap-6 justify-center">
+            <a href="{% url 'home' %}" class="bg-white text-amber-900 border-2 border-amber-900 px-8 py-4 rounded-2xl font-black transition-all hover:bg-amber-50 flex items-center justify-center gap-2">
+                <i class="bi bi-house"></i> BACK HOME
             </a>
-            <a href="{% url 'product-list' %}" class="secondary-btn flex items-center justify-center gap-2 px-6 py-3 transition">
-                <i class="bi bi-shop"></i> <span class="text-sm sm:text-base">Continue Shopping</span>
+            <a href="{% url 'product-list' %}" class="bg-amber-600 text-white px-8 py-4 rounded-2xl font-black transition-all hover:bg-amber-700 shadow-lg shadow-amber-200 flex items-center justify-center gap-2">
+                <i class="bi bi-shop"></i> CONTINUE SHOPPING
             </a>
         </div>
     </div>
 </section>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #d97706; border-radius: 10px; }
+</style>
 {% endblock %}

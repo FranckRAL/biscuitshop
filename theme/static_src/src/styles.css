@@ -226,7 +226,7 @@
   }
   
   .active {
-    @apply border-2 border-blue-500;
+    @apply border-2 border-amber-500 shadow-md;
   }
 
   /* Responsive container */

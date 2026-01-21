@@ -26,12 +26,12 @@ ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost']) #t
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
+    'django.contrib.staticfiles',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
-    'django.contrib.staticfiles',
     'shop.apps.ShopConfig',
     'django.contrib.admin',
     'tailwind',
@@ -109,6 +109,7 @@ CLOUDINARY_STORAGE = {
     'CLOUD_NAME': env('CLOUDINARY_NAME'),
     'API_KEY': env('CLOUDINARY_API_KEY'),
     'API_SECRET': env('CLOUDINARY_API_SECRET'),
+    'STATICFILES_STORAGE': None,
 }
 
 cloudinary.config(
@@ -117,6 +118,8 @@ cloudinary.config(
     api_secret=CLOUDINARY_STORAGE['API_SECRET'],
 )
 
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
@@ -170,11 +173,23 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'shop/static']
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        # "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -186,7 +201,7 @@ TAILWIND_APP_NAME = 'theme'
 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
-SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+SESSION_COOKIE_AGE = 1209600                            # 2 weeks in seconds
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 ENV_MODE = env('ENV_MODE')

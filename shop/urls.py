@@ -4,15 +4,21 @@ from . import views
 from django.conf import settings
 
 urlpatterns = [
-    
+    #pages
     path('', views.home, name='home'),
+    path('about_us/', views.about_us, name='about-us'),
+    path('contact_us', views.contact_us, name='contact-us'),
+    path('products/', views.products_list_view, name='product-list'),
+    path('product/<int:product_id>/detail/', views.product_detail_view, name='product-detail'),
+    
+    
+    #Authentication
     path('login/', views.login_view, name='login'),
     path('register', views.register_view, name='register'),
     path('logout/', views.logout_view, name='logout'),
     
-    path('products/', views.products_list_view, name='product-list'),
-    path('product/<int:product_id>/detail/', views.product_detail_view, name='product-detail'),
     
+    #Cart and Wishlist
     path('cart/', views.cart_view, name='cart'),
     path('cart/add/<int:product_id>/', views.add_to_cart, name='add-to-cart'),
     path('cart/remove/<int:product_id>/', views.remove_from_cart, name='remove-from-cart'),
@@ -22,6 +28,7 @@ urlpatterns = [
     path('toggle-favorite/<int:product_id>/', views.toggle_favorite, name='toggle-favorite'),
     
     
+    #payment
     path('checkout/', views.checkout_view, name='checkout'),
     path('payment/<int:order_id>/process/', views.process_payment, name='process_payment'),
     path('payment/<int:order_id>/waiting/', views.order_waiting, name='order_waiting'),

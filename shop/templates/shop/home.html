@@ -1,65 +1,131 @@
 {% extends "shop/main.html" %} 
 {% load static %} 
-{% block title %}Home - BiscuitShop{% endblock %} 
-{% block content %}
-<section class="py-12 lg:py-20">
-  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
-    <article class="text-center lg:text-left">
-      <h1 class="text-3xl sm:text-4xl lg:text-5xl text-blue-600 quicksand-bold mb-4">
-        Welcome to Biscuit'tsika!
-      </h1>
-      <p class="text-gray-700 text-base sm:text-lg mb-6 leading-relaxed">
-        Your one-stop shop for delicious biscuits and treats.
-      </p>
-      <a
-        href="{% url 'product-list' %}"
-        class="primary-btn inline-block"
-      >
-        <i class="bi bi-shop"></i> Browse Products
-      </a>
-    </article>
-    
-    <div class="flex items-center justify-center overflow-hidden rounded-lg shadow-lg">
-      <img
-        id="main_image"
-        src="{% static 'images/biscuit1.jpg' %}"
-        alt="Delicious Biscuits"
-        class="w-full h-auto max-h-96 object-cover"
-        loading="lazy"
-        data-url="{% static 'images/biscuit1.jpg' %}"
-      />
-    </div>
-  </div>
-  
-  <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-10 lg:mt-14">
-    <img
-      id="image_1"
-      src="{% static 'images/biscuit1_thumbnail.jpg' %}"
-      alt="Delicious Biscuits"
-      class="thumbnail-img active"
-      loading="lazy"
-      data-url="{% static 'images/biscuit1.jpg' %}"
-    />
-    <img
-      id="image_2"
-      src="{% static 'images/biscuit_2_thumbnail.jpg' %}"
-      alt="Delicious Biscuits"
-      class="thumbnail-img"
-      loading="lazy"
-      data-url="{% static 'images/biscuit_2.jpg' %}"
-    />
-    <img
-      id="image_3"
-      src="{% static 'images/biscuit_3_thumbnail.jpg' %}"
-      alt="Delicious Biscuits"
-      class="thumbnail-img"
-      loading="lazy"
-      data-url="{% static 'images/biscuit_3.jpg' %}"
-    />
-  </div>
-</section>
+{% block title %}Home - Biscuit'tsika{% endblock %} 
 
-{% endblock %} {% block extra_js %}
+{% block content %}
+<div class="bg-white oxygen-regular">
+    <section class="py-12 lg:py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+            <article class="text-center lg:text-left">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl text-gray-900 font-black mb-6 tracking-tight quicksand-bold">
+                    Welcome to <span class="text-amber-600">Biscuit'tsika!</span>
+                </h1>
+                <p class="text-gray-600 text-lg sm:text-xl mb-8 leading-relaxed max-w-xl mx-auto lg:mx-0">
+                    Your one-stop shop for delicious, handcrafted biscuits and treats made with love.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
+                    <a href="{% url 'product-list' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-amber-200 transition transform hover:-translate-y-1 inline-flex items-center justify-center">
+                        <i class="bi bi-shop mr-2"></i> Browse Products
+                    </a>
+                    <a href="{% url 'about-us' %}" class="bg-white border-2 border-gray-100 hover:border-amber-200 px-8 py-4 rounded-xl font-bold text-gray-700 transition inline-flex items-center justify-center">
+                        Our Story
+                    </a>
+                </div>
+            </article>
+            
+            <div class="relative">
+                <div class="absolute -inset-4 bg-amber-100/50 rounded-3xl -z-10 blur-2xl"></div>
+                
+                <div class="flex items-center justify-center overflow-hidden rounded-3xl shadow-2xl border-8 border-white w-full h-[300px] md:h-[350px]">
+                    <img
+                        id="main_image"
+                        src="{% static 'images/biscuit1.jpg' %}"
+                        alt="Delicious Biscuits"
+                        class="w-full h-full object-cover transition-opacity duration-500"
+                        loading="lazy"
+                        data-url="{% static 'images/biscuit1.jpg' %}"
+                    />
+                </div>
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap items-center justify-center gap-4 mt-12">
+    {% for i in "123" %}
+        {% with "images/biscuit"|add:i as base_path %}
+            <img
+                id="image_{{ forloop.counter }}"
+                src="{% static base_path|add:'_thumbnail.jpg' %}"
+                alt="Thumbnail"
+                class="thumbnail-img w-20 h-20 rounded-xl  cursor-pointer transition-all hover:scale-110 {% if forloop.first %}active{% endif %}"
+                loading="lazy"
+                data-url="{% static base_path|add:'.jpg' %}"
+            />
+        {% endwith %}
+    {% endfor %}
+</div>
+    </section>
+
+    <section class="py-12 bg-gray-50">
+        <div class="max-w-7xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div class="flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-600 text-2xl mb-4"><i class="bi bi-truck"></i></div>
+                <h4 class="text-sm font-bold text-gray-900 quicksand-bold">Fast Delivery</h4>
+                <p class="text-xs text-gray-500 mt-1">Across Antsirabe</p>
+            </div>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-600 text-2xl mb-4"><i class="bi bi-stars"></i></div>
+                <h4 class="text-sm font-bold text-gray-900 quicksand-bold">Premium Quality</h4>
+                <p class="text-xs text-gray-500 mt-1">Natural Ingredients</p>
+            </div>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-600 text-2xl mb-4"><i class="bi bi-suit-heart"></i></div>
+                <h4 class="text-sm font-bold text-gray-900 quicksand-bold">Handmade</h4>
+                <p class="text-xs text-gray-500 mt-1">Baked with Passion</p>
+            </div>
+            <div class="flex flex-col items-center text-center">
+                <div class="w-14 h-14 bg-white rounded-2xl shadow-sm flex items-center justify-center text-amber-600 text-2xl mb-4"><i class="bi bi-shield-check"></i></div>
+                <h4 class="text-sm font-bold text-gray-900 quicksand-bold">Secure Payment</h4>
+                <p class="text-xs text-gray-500 mt-1">Mvola</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 max-w-7xl mx-auto px-4">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-12 gap-4">
+            <div class="text-center md:text-left">
+                <h2 class="text-3xl font-black text-gray-900 italic quicksand-bold">Our <span class="text-amber-600 underline decoration-amber-200">Best Sellers</span></h2>
+                <p class="text-gray-500">Discover the biscuits everyone is talking about.</p>
+            </div>
+            <a href="{% url 'product-list' %}" class="bg-amber-50 text-amber-700 px-6 py-2 rounded-full font-bold hover:bg-amber-100 transition">View All →</a>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div class="group cursor-pointer">
+                <div class="relative overflow-hidden rounded-3xl bg-gray-100 aspect-square mb-4 shadow-sm">
+                    <img src="{% static 'images/biscuit1.jpg' %}" class="object-cover w-full h-full group-hover:scale-110 transition-transform duration-700">
+                    <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-tighter shadow-sm">Hot Deal</div>
+                </div>
+                <h3 class="font-bold text-gray-900 text-lg quicksand-bold">Choco-Fudge Delight</h3>
+                <div class="flex justify-between items-center mt-2">
+                    <p class="text-amber-600 font-black text-xl">5.000 Ar</p>
+                    <button class="w-10 h-10 bg-gray-900 text-white rounded-full flex items-center justify-center hover:bg-amber-600 transition shadow-lg"><i class="bi bi-plus-lg"></i></button>
+                </div>
+            </div>
+            </div>
+    </section>
+
+    <section class="py-20 px-4">
+        <div class="max-w-5xl mx-auto bg-amber-600 rounded-[3rem] p-10 md:p-20 text-center text-white relative overflow-hidden shadow-2xl shadow-amber-200/50">
+            <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/food.png')]"></div>
+            
+            <div class="relative z-10">
+                <i class="bi bi-quote text-6xl text-amber-200/50 mb-6 block"></i>
+                <p class="text-2xl md:text-3xl font-medium leading-relaxed mb-10 italic">
+                    "The best biscuits I've ever tasted. Every bite reminds me of home. Truly artisanal and made with love!"
+                </p>
+                <div class="flex flex-col items-center">
+                    <div class="w-16 h-16 bg-white/20 rounded-full border-4 border-white/30 mb-4 overflow-hidden">
+                        </div>
+                    <h5 class="font-black text-lg quicksand-bold">Miora Rakoto</h5>
+                    <p class="text-amber-200 text-sm">Loyal Customer since 2021</p>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
 <script src="{% static 'js/utils.js' %}"></script>
 <script src="{% static 'js/home.js' %}"></script>
 {% endblock extra_js %}

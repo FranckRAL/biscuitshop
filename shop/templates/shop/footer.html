@@ -1,0 +1,58 @@
+<footer class="bg-amber-50 border-t border-amber-200 pt-16 pb-8 px-4 mt-20">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12 text-left">
+            
+            <div class="space-y-4">
+                <h2 class="text-2xl font-black text-amber-900 italic quicksand-bold">Biscuit<span class="text-amber-500">'tsika</span></h2>
+                <p class="text-amber-800/70 text-sm leading-relaxed">
+                    Passionate artisanal bakers, we create moments of sweetness using local ingredients and a touch of love. The authentic taste of homemade goodness
+                </p>
+                <div class="flex gap-4">
+                    <a href="#" class="text-amber-900 hover:text-amber-600 transition-colors"><i class="bi bi-facebook text-xl"></i></a>
+                    <a href="#" class="text-amber-900 hover:text-amber-600 transition-colors"><i class="bi bi-instagram text-xl"></i></a>
+                    <a href="#" class="text-amber-900 hover:text-amber-600 transition-colors"><i class="bi bi-tiktok text-xl"></i></a>
+                </div>
+            </div>
+
+            <div>
+                <h3 class="text-amber-900 font-bold mb-6 uppercase tracking-wider text-sm quicksand-bold">Navigation</h3>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'product-list' %}" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">All Products</a></li>
+                    <li><a href="{% url 'about-us' %}" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">Our story</a></li>
+                    <li><a href="#" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">Recipes & Blog</a></li>
+                    <li><a href="{% url 'wishlist' %}" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">My Wishlist</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="text-amber-900 font-bold mb-6 uppercase tracking-wider text-sm quicksand-bold">Aide & Service</h3>
+                <ul class="space-y-3">
+                    <li><a href="{% url 'contact-us' %}" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">Contact Us</a></li>
+                    <li><a href="#" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">Shipping & Returns</a></li>
+                    <li><a href="#" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">FAQ</a></li>
+                    <li><a href="#" class="text-amber-800/70 hover:text-amber-600 text-sm transition-colors">Terms & Conditions</a></li>
+                </ul>
+            </div>
+
+            <div class="space-y-4">
+                <h3 class="text-amber-900 font-bold uppercase tracking-wider text-sm quicksand-bold">Stay Updated</h3>
+                <p class="text-amber-800/70 text-sm">Subscribe to receive exclusive offers and fresh treats.</p>
+                <form class="flex flex-col gap-2">
+                    <input type="email" placeholder="your@email.com" class="bg-white border border-amber-200 rounded-xl px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 transition-all">
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white rounded-xl py-2 text-sm font-bold shadow-md transition-all active:scale-95">Subscribe</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="border-t border-amber-200 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <p class="text-amber-900/50 text-xs">
+                &copy; 2026 <span class="font-bold">Biscuit'tsika</span>. Crafted with passion in Madagascar.
+            </p>
+            <div class="flex items-center gap-4 opacity-50 grayscale hover:grayscale-0 transition-all">
+                <i class="bi bi-credit-card-2-back text-2xl" title="Visa/Mastercard"></i>
+                <i class="bi bi-wallet2 text-2xl" title="Mobile Money"></i>
+                <i class="bi bi-shield-check text-2xl" title="Paiement Sécurisé"></i>
+            </div>
+        </div>
+    </div>
+</footer>

@@ -1,51 +1,59 @@
 {% extends "shop/main.html" %}
 {% load static %}
 
-{% block title %}Your Shopping Cart{% endblock title %}
+{% block title %}Your Basket - Biscuit'tsika{% endblock title %}
 
 {% block content %}
-<section>
-    <h1 class="text-3xl sm:text-4xl font-bold mb-6 text-gray-800">Your Shopping Cart</h1>
+<section class="py-8">
+    <div class="flex items-center gap-4 mb-10">
+        <div class="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+            <i class="bi bi-cart3 text-2xl"></i>
+        </div>
+        <div>
+            <h1 class="text-3xl sm:text-4xl font-black text-amber-900 italic quicksand-bold">Your Basket</h1>
+            <p class="text-amber-800/60 text-sm">Review your delicious selection</p>
+        </div>
+    </div>
 
     {% if cart_items %}
-        <!-- Desktop Table View -->
-        <div class="overflow-x-auto hidden sm:block shadow-lg rounded-lg">
+        <div class="overflow-hidden hidden sm:block shadow-xl shadow-amber-900/5 rounded-[2rem] border border-amber-100 mb-8">
             <table class="w-full bg-white">
                 <thead>
-                    <tr class="bg-gray-100 border-b border-gray-300">
-                        <th class="py-3 px-4 text-left font-semibold text-gray-700">Product</th>
-                        <th class="py-3 px-4 text-center font-semibold text-gray-700">Quantity</th>
-                        <th class="py-3 px-4 text-right font-semibold text-gray-700">Price</th>
-                        <th class="py-3 px-4 text-right font-semibold text-gray-700">Total</th>
-                        <th class="py-3 px-4 text-center font-semibold text-gray-700">Actions</th>
+                    <tr class="bg-amber-50/50 border-b border-amber-100">
+                        <th class="py-5 px-6 text-left text-xs font-black text-amber-900 uppercase tracking-widest">Product</th>
+                        <th class="py-5 px-6 text-center text-xs font-black text-amber-900 uppercase tracking-widest">Quantity</th>
+                        <th class="py-5 px-6 text-right text-xs font-black text-amber-900 uppercase tracking-widest">Price</th>
+                        <th class="py-5 px-6 text-right text-xs font-black text-amber-900 uppercase tracking-widest">Total</th>
+                        <th class="py-5 px-6 text-center text-xs font-black text-amber-900 uppercase tracking-widest">Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-amber-50">
                     {% for item in cart_items %}
-                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
-                        <td class="py-4 px-4 text-gray-800">{{ item.product.name }}</td>
-                        <td class="py-4 px-4 text-center text-gray-700">{{ item.quantity }}</td>
-                        <td class="py-4 px-4 text-right text-gray-700">Ar {{ item.product.price }}</td>
-                        <td class="py-4 px-4 text-right font-semibold text-gray-800">Ar {{ item.subtotal }}</td>
-                        <td class="py-4 px-4 text-center">
+                    <tr class="hover:bg-amber-50/30 transition-colors group">
+                        <td class="py-5 px-6">
+                            <div class="flex items-center gap-4">
+                                <div class="w-16 h-16 bg-amber-50 rounded-2xl overflow-hidden border border-amber-100 flex-shrink-0">
+                                    <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
+                                </div>
+                                <span class="font-bold text-amber-900">{{ item.product.name }}</span>
+                            </div>
+                        </td>
+                        <td class="py-5 px-6 text-center font-bold text-amber-800">{{ item.quantity }}</td>
+                        <td class="py-5 px-6 text-right text-amber-800/60 font-medium italic text-sm">Ar {{ item.product.price }}</td>
+                        <td class="py-5 px-6 text-right font-black text-amber-600 text-lg">Ar {{ item.subtotal }}</td>
+                        <td class="py-5 px-6">
                             <div class="flex gap-2 justify-center">
-                                <button 
-                                    class="increase-cart-btn p-2 bg-green-500 text-white rounded hover:bg-green-600 transition"
-                                    data-url="{% url 'add-to-cart' item.product.id %}"
-                                    title="Increase quantity">
-                                    <i class="bi bi-plus"></i>
+                                <button class="increase-cart-btn w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm active:scale-90"
+                                    data-url="{% url 'add-to-cart' item.product.id %}">
+                                    <i class="bi bi-plus-lg"></i>
                                 </button>
-                                <button 
-                                    class="decrease-cart-btn p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition"
-                                    data-url="{% url 'substract-from-cart' item.product.id %}"
-                                    title="Decrease quantity">
-                                    <i class="bi bi-dash"></i>
+                                <button class="decrease-cart-btn w-10 h-10 flex items-center justify-center bg-amber-100 text-amber-700 rounded-xl hover:bg-amber-600 hover:text-white transition-all shadow-sm active:scale-90"
+                                    data-url="{% url 'substract-from-cart' item.product.id %}">
+                                    <i class="bi bi-dash-lg"></i>
                                 </button>
-                                <button 
-                                    class="remove-cart-btn p-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-                                    data-url="{% url 'remove-from-cart' item.product.id %}"
-                                    title="Remove from cart">
-                                    <i class="bi bi-trash"></i>
+                                <button class="remove-cart-btn w-10 h-10 flex items-center justify-center bg-rose-50 text-rose-600 rounded-xl hover:bg-rose-500 hover:text-white transition-all shadow-sm active:scale-90"
+                                    data-url="{% url 'remove-from-cart' item.product.id %}">
+                                    <i class="bi bi-trash3"></i>
                                 </button>
                             </div>
                         </td>   
@@ -55,75 +63,71 @@
             </table>
         </div>
 
-        <!-- Mobile Card View -->
         <div class="sm:hidden space-y-4">
             {% for item in cart_items %}
-            <article class="bg-white border border-gray-200 rounded-lg p-4 shadow">
-                <h3 class="font-semibold text-lg text-gray-800 mb-2">{{ item.product.name }}</h3>
-                <div class="grid grid-cols-2 gap-4 mb-4 text-sm">
-                    <div>
-                        <p class="text-gray-600">Quantity</p>
-                        <p class="font-semibold text-gray-800">{{ item.quantity }}</p>
+            <article class="bg-white border border-amber-100 rounded-[2rem] p-6 shadow-md relative overflow-hidden">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-20 h-20 bg-amber-50 rounded-2xl overflow-hidden border border-amber-100">
+                        <img src="{{ item.product.image.url }}" alt="{{ item.product.name }}" class="w-full h-full object-cover">
                     </div>
                     <div>
-                        <p class="text-gray-600">Unit Price</p>
-                        <p class="font-semibold text-gray-800">Ar {{ item.product.price }}</p>
-                    </div>
-                    <div>
-                        <p class="text-gray-600">Subtotal</p>
-                        <p class="font-bold text-green-600">Ar {{ item.subtotal }}</p>
+                        <h3 class="font-black text-amber-900 leading-tight">{{ item.product.name }}</h3>
+                        <p class="text-amber-600 font-bold text-lg mt-1">Ar {{ item.subtotal }}</p>
                     </div>
                 </div>
-                <div class="flex gap-2">
-                    <button 
-                        class="increase-cart-btn flex-1 p-2 bg-green-500 text-white rounded hover:bg-green-600 transition flex items-center justify-center gap-2"
-                        data-url="{% url 'add-to-cart' item.product.id %}"
-                        title="Increase quantity">
-                        <i class="bi bi-plus"></i>
-                    </button>
-                    <button 
-                        class="decrease-cart-btn flex-1 p-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition flex items-center justify-center gap-2"
-                        data-url="{% url 'substract-from-cart' item.product.id %}"
-                        title="Decrease quantity">
-                        <i class="bi bi-dash"></i>
-                    </button>
-                    <button 
-                        class="remove-cart-btn flex-1 p-2 bg-red-500 text-white rounded hover:bg-red-600 transition flex items-center justify-center gap-2"
-                        data-url="{% url 'remove-from-cart' item.product.id %}"
-                        title="Remove from cart">
-                        <i class="bi bi-trash"></i>
-                    </button>
+                
+                <div class="flex items-center justify-between bg-amber-50 rounded-2xl p-3 mb-4">
+                    <div class="text-center px-4">
+                        <p class="text-[10px] uppercase font-black text-amber-800/40">Qty</p>
+                        <p class="font-black text-amber-900">{{ item.quantity }}</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <button class="increase-cart-btn w-10 h-10 bg-white text-amber-600 rounded-xl flex items-center justify-center shadow-sm" data-url="{% url 'add-to-cart' item.product.id %}"><i class="bi bi-plus"></i></button>
+                        <button class="decrease-cart-btn w-10 h-10 bg-white text-amber-600 rounded-xl flex items-center justify-center shadow-sm" data-url="{% url 'substract-from-cart' item.product.id %}"><i class="bi bi-dash"></i></button>
+                        <button class="remove-cart-btn w-10 h-10 bg-rose-50 text-rose-500 rounded-xl flex items-center justify-center shadow-sm" data-url="{% url 'remove-from-cart' item.product.id %}"><i class="bi bi-trash"></i></button>
+                    </div>
                 </div>
             </article>
             {% endfor %}
         </div>
 
-        <!-- Cart Summary and Checkout -->
-        <div class="mt-8 flex flex-col sm:flex-row justify-end gap-4">
-            <div class="bg-white rounded-lg shadow-lg p-6 w-full sm:w-72">
-                <h2 class="text-xl font-bold mb-4 text-gray-800">Order Summary</h2>
-                <div class="border-b pb-4 mb-4">
-                    <p class="text-gray-600 mb-2">Subtotal:</p>
-                    <p class="text-2xl font-bold text-green-600">Ar {{ cart.get_total_price }}</p>
+        <div class="mt-12 flex flex-col sm:flex-row justify-end items-start gap-8">
+            <div class="bg-white rounded-[2.5rem] shadow-2xl shadow-amber-900/10 p-8 w-full sm:w-96 border border-amber-100 relative">
+                <h2 class="text-xl font-black mb-6 text-amber-900 italic">Summary</h2>
+                <div class="space-y-4 border-b border-amber-50 pb-6 mb-6">
+                    <div class="flex justify-between items-center text-amber-800/60">
+                        <span class="font-medium text-sm">Total Items</span>
+                        <span class="font-bold">{{ cart_items|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="font-bold text-amber-900">Total Price</span>
+                        <span class="text-3xl font-black text-amber-600 italic leading-none">Ar {{ cart.get_total_price }}</span>
+                    </div>
                 </div>
-                <a href="{% url 'checkout' %}" class="btn primary-btn w-full text-center py-3 font-semibold transition">
-                    <i class="bi bi-lock"></i> Proceed to Checkout
+                <a href="{% url 'checkout' %}" class="w-full bg-amber-600 hover:bg-amber-700 text-white text-center py-5 rounded-2xl font-black flex items-center justify-center gap-3 transition-all shadow-lg shadow-amber-200 active:scale-95 group">
+                    <i class="bi bi-lock-fill text-xl group-hover:scale-110 transition-transform"></i>
+                    <span class="uppercase tracking-widest">Proceed to Checkout</span>
                 </a>
+                <p class="text-[10px] text-center text-amber-800/30 mt-4 font-bold uppercase tracking-tighter">Secure Payment Gateway</p>
             </div>
         </div>
 
     {% else %}
-        <!-- Empty Cart State -->
-        <div class="flex flex-col items-center justify-center py-16 px-4">
-            <i class="bi bi-cart-x text-6xl text-gray-300 mb-4"></i>
-            <p class="text-lg sm:text-xl text-gray-600 text-center mb-4">Your cart is empty.</p>
-            <a href="{% url 'product-list' %}" class="primary-btn inline-block">
-                <i class="bi bi-shop"></i> Continue Shopping
+        <div class="flex flex-col items-center justify-center py-24 px-4 bg-amber-50/50 rounded-[3rem] border-2 border-dashed border-amber-200">
+            <div class="relative mb-8">
+                <i class="bi bi-basket text-8xl text-amber-100"></i>
+                <i class="bi bi-x absolute -bottom-2 -right-2 text-5xl text-rose-300"></i>
+            </div>
+            <h2 class="text-2xl font-black text-amber-900 mb-2 italic quicksand-bold">Hungry? Your cart is empty!</h2>
+            <p class="text-amber-800/60 text-center mb-10 max-w-sm">
+                Don't leave without a treat. Our freshly baked biscuits are waiting for you.
+            </p>
+            <a href="{% url 'product-list' %}" class="bg-amber-600 hover:bg-amber-700 text-white px-10 py-4 rounded-full font-black shadow-lg shadow-amber-200 transition-all hover:-translate-y-1 active:scale-95 flex items-center gap-3">
+                <i class="bi bi-shop"></i> <span class="uppercase tracking-widest text-sm">Explore our Treats</span>
             </a>
         </div>
     {% endif %}
 </section>
-
 {% endblock content %}
 
 {% block extra_js %}

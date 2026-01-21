@@ -20,7 +20,7 @@ import json
 
 logger = logging.getLogger(__name__)
 
-
+#pages views
 def home(request):
     biscuits = Product.objects.all()
     context = {
@@ -28,6 +28,14 @@ def home(request):
     }
     return render(request, 'shop/home.html', context)
 
+def about_us(request):
+    return render(request, 'shop/about.html')
+
+def contact_us(request):
+    return render(request, 'shop/contact.html')
+
+
+#Authentication views
 def login_view(request):
     """Handle user login"""
     if request.method == 'POST':
@@ -133,6 +141,8 @@ def product_detail_view(request, product_id):
         return JsonResponse({'success': True, 'html': html})
     except Product.DoesNotExist:
         return JsonResponse({'success': False, 'error': 'Product not found'}, status=404)
+
+
 
 # Cart management views
 def cart_view(request):

@@ -1,112 +1,127 @@
 {% extends 'shop/main.html'%}
 {% load static %}
 {% block content%}
-<section class="py-8 sm:py-12">
+<section class="py-12 bg-amber-50/30">
     <div class="max-w-5xl mx-auto px-4">
-        <h1 class="text-3xl sm:text-4xl font-bold mb-8 text-gray-800">Checkout</h1>
+        <div class="flex items-center gap-4 mb-10">
+            <div class="w-12 h-12 bg-amber-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-200">
+                <i class="bi bi-bag-check-fill text-2xl"></i>
+            </div>
+            <div>
+                <h1 class="text-3xl sm:text-4xl font-black text-amber-900 italic">Checkout</h1>
+                <p class="text-amber-800/60 text-sm">Finalize your sweet order</p>
+            </div>
+        </div>
         
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <!-- Cart Summary -->
-            <article class="bg-white shadow-md rounded-lg p-6 border border-gray-200 h-fit">
-                <h2 class="text-2xl font-semibold mb-6 pb-4 border-b">Order Summary</h2>
-                <ul class="space-y-4 mb-6 max-h-96 overflow-y-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-10 items-start">
+            
+            <article class="bg-white shadow-xl shadow-amber-900/5 rounded-[2.5rem] p-8 border border-amber-100 sticky top-24">
+                <h2 class="text-xl font-bold mb-6 text-amber-900 flex items-center gap-2">
+                    <i class="bi bi-list-ul text-amber-600"></i> Order Summary
+                </h2>
+                
+                <ul class="space-y-4 mb-8 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
                     {% for item in cart_items %}
-                        <li class="flex justify-between items-start pb-4 border-b last:border-b-0">
-                            <div class="flex-grow">
-                                <p class="font-medium text-gray-800">{{ item.product.name }}</p>
-                                <p class="text-sm text-gray-500">Qty: {{ item.quantity }}</p>
+                        <li class="flex justify-between items-center pb-4 border-b border-amber-50 last:border-b-0">
+                            <div class="flex items-center gap-4">
+                                <div class="w-14 h-14 bg-amber-50 rounded-xl overflow-hidden border border-amber-100">
+                                    <img src="{{ item.product.image.url }}" class="w-full h-full object-cover" alt="{{ item.product.name }}">
+                                </div>
+                                <div>
+                                    <p class="font-bold text-amber-900">{{ item.product.name }}</p>
+                                    <p class="text-xs text-amber-800/50 font-medium">Quantity: {{ item.quantity }}</p>
+                                </div>
                             </div>
-                            <p class="font-semibold text-gray-800 text-right">Ar {{ item.subtotal }}</p>
+                            <p class="font-black text-amber-700">Ar {{ item.subtotal }}</p>
                         </li>
                     {% empty %}
-                        <li class="text-gray-500 text-center py-4">No items in this order.</li>
+                        <li class="text-amber-800/40 text-center py-8 italic">Your basket is empty.</li>
                     {% endfor %}
                 </ul>
 
-                <div class="border-t pt-4">
-                    <div class="flex justify-between items-center mb-2">
-                        <span class="text-gray-600">Subtotal:</span>
-                        <span class="font-bold text-green-600 text-lg">Ar {{ cart_total_price }}</span>
+                <div class="bg-amber-50 rounded-2xl p-6 space-y-3">
+                    <div class="flex justify-between items-center text-amber-900/70">
+                        <span class="text-sm font-medium">Subtotal</span>
+                        <span class="font-bold italic text-sm">Ar {{ cart_total_price }}</span>
                     </div>
-                    <p class="text-xs text-gray-500">Ordered at: {{ datetime.now|date:"Y-m-d H:i"}}</p>
+                    <div class="flex justify-between items-center text-amber-900/70">
+                        <span class="text-sm font-medium">Delivery</span>
+                        <span class="text-xs font-bold uppercase text-emerald-600 bg-emerald-100 px-2 py-1 rounded-md">Calculated later</span>
+                    </div>
+                    <div class="border-t border-amber-200 pt-3 flex justify-between items-center">
+                        <span class="text-amber-900 font-black text-lg">Total</span>
+                        <span class="font-black text-amber-600 text-2xl">Ar {{ cart_total_price }}</span>
+                    </div>
                 </div>
+                <p class="text-[10px] text-amber-900/30 mt-4 text-center uppercase tracking-widest font-bold">
+                    Order date: {{ datetime.now|date:"d M Y • H:i" }}
+                </p>
             </article>
 
-            <!-- Shipping Form -->
-            <article class="bg-white shadow-md rounded-lg p-6 border border-gray-200">
-                <h2 class="text-2xl font-semibold mb-6 pb-4 border-b">Shipping Information</h2>
-                <form method="post" class="space-y-5">
+            <article class="bg-white shadow-xl shadow-amber-900/5 rounded-[2.5rem] p-8 border border-amber-100">
+                <h2 class="text-xl font-bold mb-8 text-amber-900 flex items-center gap-2">
+                    <i class="bi bi-truck text-amber-600"></i> Shipping Details
+                </h2>
+                
+                <form method="post" class="space-y-6">
                     {% csrf_token %}
                     
-                    <!-- Full Name -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="full_name">Full Name</label>
-                        <input type="text" id="full_name" name="full_name" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-amber-900/40 uppercase tracking-widest mb-2 ml-1">Full Name</label>
+                            <input type="text" name="full_name" class="w-full px-5 py-3 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none" placeholder="John Doe" required>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-xs font-black text-amber-900/40 uppercase tracking-widest mb-2 ml-1">Delivery Address</label>
+                            <input type="text" name="address" class="w-full px-5 py-3 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none" placeholder="Lot IV 24..." required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-amber-900/40 uppercase tracking-widest mb-2 ml-1">City</label>
+                            <input type="text" name="city" class="w-full px-5 py-3 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-black text-amber-900/40 uppercase tracking-widest mb-2 ml-1">Phone Number</label>
+                            <input type="tel" name="phone" class="w-full px-5 py-3 bg-amber-50/50 border border-amber-100 rounded-2xl focus:ring-4 focus:ring-amber-500/10 focus:border-amber-500 transition-all outline-none" placeholder="034..." required>
+                        </div>
                     </div>
 
-                    <!-- Address -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="address">Address</label>
-                        <input type="text" id="address" name="address" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-
-                    <!-- City -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="city">City</label>
-                        <input type="text" id="city" name="city" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-
-                    <!-- Postal Code -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="postal_code">Postal Code</label>
-                        <input type="text" id="postal_code" name="postal_code" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-
-                    <!-- Country -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="country">Country</label>
-                        <input type="text" id="country" name="country" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-
-                    <!-- Phone -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="phone">Phone Number</label>
-                        <input type="tel" id="phone" name="phone" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
-                    </div>
-
-                    <!-- Payment Method -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="payment_method">Payment Method</label>
-                        <select id="payment_method" name="payment_method" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition">
-                            <option value="mvola" selected>Mvola</option>
+                    <div class="pt-6 border-t border-amber-50">
+                        <label class="block text-xs font-black text-amber-900/40 uppercase tracking-widest mb-4 ml-1 italic">Select Payment Method</label>
+                        <select id="payment_method" name="payment_method" class="w-full px-5 py-4 bg-amber-900 text-white rounded-2xl focus:ring-4 focus:ring-amber-500/20 outline-none transition-all cursor-pointer font-bold appearance-none">
+                            <option value="mvola">Mvola (Madagascar)</option>
                             <option value="orange">Orange Money</option>
                             <option value="airtel">Airtel Money</option>
-                            <option value="card">Credit/Debit Card</option>
-                            <option value="paypal">PayPal</option>
                             <option value="cod">Cash on Delivery</option>
                         </select>
                     </div>
 
-                    <!-- Dynamic fields container -->
-                    <div id="extra-fields" class="mt-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2" for="wallet_number">Wallet Number</label>
+                    <div id="extra-fields" class="bg-amber-100/30 p-5 rounded-2xl border border-amber-200 animate-in fade-in slide-in-from-top-2">
+                        <label class="block text-[10px] font-black text-amber-700 uppercase mb-2">Wallet / Phone Number for Payment</label>
                         <input type="text" id="wallet_number" name="wallet_number" 
-                            class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition" required>
+                            class="w-full px-5 py-3 bg-white border border-amber-200 rounded-xl focus:border-amber-500 outline-none transition-all font-mono tracking-widest" placeholder="03x xx xxx xx" required>
                     </div>
 
-                    <!-- Submit -->
-                    <button type="submit" class="w-full primary-btn py-3 px-4 font-semibold mt-6 transition flex items-center justify-center gap-2">
-                        <i class="bi bi-check-circle"></i> Place Order
+                    <button type="submit" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-black py-5 rounded-[2rem] shadow-xl shadow-amber-600/20 flex items-center justify-center gap-3 transition-all hover:-translate-y-1 active:scale-95 text-lg">
+                        <i class="bi bi-shield-check"></i>
+                        <span class="uppercase tracking-widest">Confirm Order</span>
                     </button>
+                    
+                    <p class="text-[10px] text-center text-amber-800/40 italic">
+                        <i class="bi bi-lock-fill"></i> Secure encrypted transaction
+                    </p>
                 </form>
             </article>
         </div>
     </div>
 </section>
 
+<style>
+    /* Custom scrollbar pour le résumé de commande */
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #d97706; border-radius: 10px; }
+</style>
 {% endblock content%}
-
-{% block extra_js %}
-    <script src="{% static 'js/utils.js'%}"></script>
-    <script src="{% static 'js/order.js'%}"></script>
-{% endblock extra_js %}

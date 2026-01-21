@@ -1,102 +1,127 @@
 {% extends "shop/main.html" %}
 {% load static %}
 {% load cloudinary %}
-{% block title %}Products - Biscuit Shop{% endblock %}
+{% block title %}Our Shop - Biscuit'tsika{% endblock %}
 
 {% block content %}
-    <!-- CSRF token MUST be near top or in a form -->
     <div style="display:none;">
         {% csrf_token %}
     </div>
 
-    <!-- Product Details Modal -->
-    <dialog class="product-details-modal" id="product-details-modal">
-        <button id="close-modal" class="close-modal-btn" aria-label="Close">
-            <i class="bi bi-x-lg text-2xl"></i>
-        </button>
-        <div id="product-details-content">
-            <!-- Product details will be loaded here via AJAX -->
-            <div>
-                <h2 class="text-2xl font-bold mb-4">Loading...</h2>
-                <p class="text-gray-600">Please wait while we load the product details.</p>
+    <dialog class="product-details-modal rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden" id="product-details-modal">
+        <div class="relative">
+            <button id="close-modal" class="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-amber-100 transition-colors" aria-label="Close">
+                <i class="bi bi-x-lg text-xl text-amber-900"></i>
+            </button>
+            <div id="product-details-content" class="bg-amber-50/30">
+                <div class="p-20 text-center">
+                    <div class="animate-spin inline-block w-8 h-8 border-4 border-amber-500 border-t-transparent rounded-full mb-4"></div>
+                    <p class="text-amber-900 font-medium italic">Un instant, la gourmandise arrive...</p>
+                </div>
             </div>
         </div>
     </dialog>
 
-    <section class="py-4">
-        <!-- Banner -->
-        <div class="banner text-white rounded-lg shadow-lg mb-8 py-12 px-4 text-center">
-            <h1 class="page-title text-3xl sm:text-4xl lg:text-5xl quicksand-bold mb-3">Welcome to the Biscuit Shop!</h1>
-            <p class="text-blue-100 text-sm sm:text-base">Discover our delicious range of biscuits and treats.</p>
+    <section class="py-8 px-2 sm:px-4">
+        <div class="relative overflow-hidden rounded-[2.5rem] bg-amber-900 mb-12 py-16 px-6 text-center shadow-xl">
+            <div class="absolute top-0 left-0 w-64 h-64 bg-amber-800 rounded-full -translate-x-1/2 -translate-y-1/2 opacity-50"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-amber-700 rounded-full translate-x-1/3 translate-y-1/3 opacity-30"></div>
+            
+            <div class="relative z-10">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-4 tracking-tight italic quicksand-bold">
+                    The Biscuit <span class="text-amber-400">Atelier</span>
+                </h1>
+                <p class="text-amber-100 text-lg max-w-2xl mx-auto font-light leading-relaxed">
+                    Every bite tells a story. Discover our handcrafted selection of authentic Malagasy treats.
+                </p>
+            </div>
         </div>
 
-        <!-- Categories Filter -->
-        <aside class="mb-8">
+        <aside class="mb-12">
             {% include "shop/categories.html" %}
         </aside>
 
-        <!-- Products Grid -->
-        <div class="mb-8">
-            <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6" role="list">
+        <div class="mb-12">
+            <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8" role="list">
                 {% for product in products %}
-                    <li class="product-card" data-detail-url="{% url 'product-detail' product.id %}">
-                        <div class="relative overflow-hidden rounded-t">
-                            <img src={{product.image.url}} alt={{product.name}} class="h-full w-full object-cover" loading="lazy" />
-                            <button class="favorite-btn"
+                    <li class="group bg-white rounded-[2rem] border border-amber-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col" data-detail-url="{% url 'product-detail' product.id %}">
+                        
+                        <div class="relative overflow-hidden aspect-square bg-amber-50">
+                            <img src="{{product.image.url}}" alt="{{product.name}}" 
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                                 loading="lazy" />
+                            
+                            <button class="favorite-btn absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-md hover:bg-amber-500 hover:text-white transition-all active:scale-90"
                                 data-url="{% url 'toggle-favorite' product.id %}"
-                                aria-label="Toggle favorite for {{product.name}}"
+                                aria-label="Favorite"
                                 data-product-id="{{ product.id }}">
                                 {% if product.id in wishlist %}
                                     <i class="bi bi-heart-fill text-red-500"></i>
                                 {% else %}
-                                    <i class="bi bi-heart text-white"></i>
+                                    <i class="bi bi-heart text-amber-900"></i>
                                 {% endif %}
                             </button>
                         </div>
-                        <div class="p-4 flex flex-col h-full">
-                            <h2 class="card-title">{{ product.name }}</h2>
-                            <p>{{product.image.name}}</p>
-                            <p class="card-description mb-2 flex-grow">{{ product.description | truncatewords:15 }}</p>
-                            <p class="card-price mb-3">Ar {{ product.price }}</p>
-                            <hr class="my-2 text-gray-200">
-                            <div class="mt-auto">
-                                <button  
-                                    class="primary-btn w-full text-center justify-center flex items-center gap-2 add-cart-btn cursor-pointer"
-                                    data-url="{% url 'add-to-cart' product.id %}"
-                                    aria-label="Add {{ product.name }} to cart">
-                                    <i class="bi bi-cart-plus"></i> <span class="text-sm sm:text-base">Add</span>
-                                </button>
+
+                        <div class="p-6 flex flex-col flex-grow">
+                            <h2 class="text-xl font-bold text-amber-900 mb-2 group-hover:text-amber-600 transition-colors quicksand-bold">
+                                {{ product.name }}
+                            </h2>
+                            <p class="text-amber-800/60 text-sm mb-4 line-clamp-2 flex-grow italic">
+                                {{ product.description|truncatewords:15 }}
+                            </p>
+                            
+                            <div class="flex items-center justify-between mb-4">
+                                <p class="text-2xl font-black text-amber-600">
+                                    <span class="text-xs font-medium text-amber-800/40 uppercase">Ar</span> {{ product.price }}
+                                </p>
+                                <div class="flex text-amber-400 text-[10px]">
+                                    <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                                </div>
                             </div>
+
+                            <button class="w-full bg-amber-600 hover:bg-amber-700 text-white font-bold py-3 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md active:scale-95 add-cart-btn"
+                                data-url="{% url 'add-to-cart' product.id %}"
+                                aria-label="Add to cart">
+                                <i class="bi bi-cart-plus text-lg"></i>
+                                <span class="uppercase tracking-widest text-xs">Add to Cart</span>
+                            </button>
                         </div>
                     </li>
                 {% endfor %}
             </ul>
         </div>
 
-        <!-- Pagination -->
-        <nav class="flex flex-wrap justify-center items-center gap-2 py-4" aria-label="Products pagination">
-            <a class="pagination-btn" href="?page=1{% if current_category %}&category={{ current_category }}{% endif %}" aria-label="First page">
-                <i class="bi bi-chevron-double-left"></i>
+        <nav class="flex justify-center items-center gap-2 mt-16" aria-label="Pagination">
+            <a href="?page=1{% if current_category %}&category={{ current_category }}{% endif %}" 
+               class="p-2 w-10 h-10 flex items-center justify-center rounded-full bg-amber-100 text-amber-900 hover:bg-amber-600 hover:text-white transition-all">
+                <i class="bi bi-chevron-double-left text-xs"></i>
             </a>
             
             {% if products.has_previous %}
-                <a href="?page={{ products.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" class="pagination-btn">Previous</a>
+                <a href="?page={{ products.previous_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                   class="px-4 py-2 rounded-full bg-amber-100 text-amber-900 font-bold text-sm hover:bg-amber-200 transition-colors">Prev</a>
             {% endif %}
             
-            {% for page in products.paginator.page_range %}
-                {% if page == products.number %}
-                    <span class="px-3 py-1 bg-gray-700 text-white rounded font-semibold" aria-current="page">{{ page }}</span>
-                {% else %}
-                    <a href="?page={{ page }}{% if current_category %}&category={{ current_category }}{% endif %}" class="pagination-btn hover:bg-gray-400 transition">{{ page }}</a>
-                {% endif %}
-            {% endfor %}
+            <div class="flex gap-1">
+                {% for page in products.paginator.page_range %}
+                    {% if page == products.number %}
+                        <span class="w-10 h-10 flex items-center justify-center rounded-full bg-amber-600 text-white font-black shadow-lg shadow-amber-200">{{ page }}</span>
+                    {% elif page > products.number|add:'-3' and page < products.number|add:'3' %}
+                        <a href="?page={{ page }}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                           class="w-10 h-10 flex items-center justify-center rounded-full text-amber-900 hover:bg-amber-100 transition-colors">{{ page }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
             
             {% if products.has_next %}
-                <a href="?page={{ products.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" class="pagination-btn">Next</a>
+                <a href="?page={{ products.next_page_number }}{% if current_category %}&category={{ current_category }}{% endif %}" 
+                   class="px-4 py-2 rounded-full bg-amber-100 text-amber-900 font-bold text-sm hover:bg-amber-200 transition-colors">Next</a>
             {% endif %}
             
-            <a class="pagination-btn" href="?page={{ products.paginator.num_pages }}{% if current_category %}&category={{ current_category }}{% endif %}" aria-label="Last page">
-                <i class="bi bi-chevron-double-right"></i>
+            <a href="?page={{ products.paginator.num_pages }}{% if current_category %}&category={{ current_category }}{% endif %}" 
+               class="p-2 w-10 h-10 flex items-center justify-center rounded-full bg-amber-100 text-amber-900 hover:bg-amber-600 hover:text-white transition-all">
+                <i class="bi bi-chevron-double-right text-xs"></i>
             </a>
         </nav>
     </section>

@@ -1,66 +1,136 @@
 <header class="header sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-100">
-    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-12 sm:h-16">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-14 sm:h-16">
         
         <div class="shrink-0">
-            <a href="{% url 'home' %}" class="group flex items-center gap-2">
-                <span class="text-2xl sm:text-3xl font-black tracking-tight text-amber-900 group-hover:text-amber-600 transition-colors quicksand-normal">
+            <a href="{% url 'home' %}" class="group flex items-center gap-2 quicksand-normal">
+                <span class="text-2xl sm:text-3xl font-black tracking-tight text-amber-900 group-hover:text-amber-600 transition-colors">
                     Biscuit<span class="text-amber-500">'tsika</span>
                 </span>
             </a>
         </div>
         
-        <div class="hidden sm:flex items-center gap-8">
-            <a href="{% url 'product-list' %}" class="text-amber-900/70 hover:text-amber-600 font-medium text-sm sm:text-base transition-all hover:translate-y-[-1px]">Shop</a>
-            <a href="{% url 'contact-us' %}" class="text-amber-900/70 hover:text-amber-600 font-medium text-sm sm:text-base transition-all hover:translate-y-[-1px]">Contact</a>
-            <a href="{% url 'about-us' %}" class="text-amber-900/70 hover:text-amber-600 font-medium text-sm sm:text-base transition-all hover:translate-y-[-1px]">Our Story</a>
+        <div class="hidden sm:flex items-center gap-8 oxygen-regular">
+            <a 
+            href="{% url 'product-list' %}" 
+            class="text-amber-900/70 hover:text-amber-600 font-bold text-sm transition-all hover:-translate-y-0.5 {% if page == 'shop' %} text-amber-600 border-b-2 border-amber-600 rounded-b p-2 bg-amber-100/50 {% endif %}">
+                Shop
+            </a>
+
+            <a 
+            href="{% url 'contact-us' %}" 
+            class="text-amber-900/70 hover:text-amber-600 font-bold text-sm transition-all hover:-translate-y-0.5 {% if page == 'contact' %} text-amber-600 border-b-2 border-amber-600 rounded-b p-2 bg-amber-100/50 {% endif %}">
+                Contact
+            </a>
+
+            <a 
+            href="{% url 'about-us' %}" 
+            class="text-amber-900/70 hover:text-amber-600 font-bold text-sm transition-all hover:-translate-y-0.5 {% if page == 'about' %} text-amber-600 border-b-2 border-amber-600 rounded-b p-2 bg-amber-100/50 {% endif %}">
+                Our Story
+            </a>
         </div>
         
-        <div class="flex items-center gap-3 sm:gap-5">
-            
-            <a href="{% url 'cart' %}" class="relative p-2 text-amber-900/80 hover:bg-amber-50 rounded-full transition-all">
-                <i class="bi bi-cart3 text-xl sm:text-2xl"></i>
-                {% if cart_count > 0 %}
-                <span id="cart-count" class="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-amber-600 text-[10px] font-bold text-white ring-2 ring-white">
-                    {{ cart_count }}
-                </span>
-                {% endif %}
-            </a>
+        <div class="flex items-center gap-2 sm:gap-4">
             
             <a href="{% url 'wishlist' %}" class="relative p-2 text-amber-900/80 hover:bg-amber-50 rounded-full transition-all">
-                <i class="bi bi-heart text-xl sm:text-2xl"></i>
-                {% if wishlist_count > 0 %}
-                <span id="wishlist-count" class="absolute top-0 right-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-white">
-                    {{ wishlist_count }}
+                <i class="bi bi-heart text-xl"></i>
+                
+                <span id="wishlist-count" class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white ring-2 ring-white">
+                    {% if wishlist_count > 0 %}{{ wishlist_count }} {% else %}0{% endif %}
                 </span>
-                {% endif %}
+                
+            </a>
+
+            <a href="{% url 'cart' %}" class="relative p-2 text-amber-900/80 hover:bg-amber-50 rounded-full transition-all">
+                <i class="bi bi-cart3 text-xl"></i>
+                
+                <span id="cart-count" class="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-amber-600 text-[10px] font-bold text-white ring-2 ring-white">
+                    {% if cart_count > 0 %}{{ cart_count }} {% else %}0{% endif %}
+                </span>
+                
             </a>
             
-            <div class="relative ml-2">
+            <div class="relative">
                 {% if request.user.is_authenticated %}
-                <button id="profile-icon" class="flex items-center justify-center w-10 h-10 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors cursor-pointer">
-                    <i class="bi bi-person text-2xl"></i>
+                <button id="profile-icon" class="flex items-center justify-center w-9 h-9 rounded-full bg-amber-100 text-amber-700 hover:bg-amber-200 transition-colors cursor-pointer">
+                    <i class="bi bi-person text-xl"></i>
                 </button>
                 
                 <div id="profile-menu" class="hidden absolute top-full right-0 mt-3 w-56 bg-white border border-amber-100 rounded-2xl shadow-xl overflow-hidden ring-1 ring-black ring-opacity-5">
                     <div class="p-4 bg-amber-50/50 border-b border-amber-100 flex flex-col items-center">
-                        <div class="w-12 h-12 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 mb-2">
-                            <i class="bi bi-person-fill text-2xl"></i>
+                        <div class="w-10 h-10 bg-amber-200 rounded-full flex items-center justify-center text-amber-700 mb-2">
+                            <i class="bi bi-person-fill text-xl"></i>
                         </div>
-                        <span class="text-amber-900 font-bold">{{request.user.username | title}}</span>
-                        <span class="text-amber-900/60 text-xs truncate w-full text-center">{{request.user.email}}</span>
+                        <span class="text-amber-900 font-bold text-sm">{{request.user.username | title}}</span>
+                        <span class="text-amber-900/60 text-[10px] truncate w-full text-center">{{request.user.email}}</span>
                     </div>
                     <div class="p-2">
-                        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                        <a href="{% url 'logout' %}" class="flex items-center gap-2 px-4 py-2 text-sm text-rose-600 hover:bg-rose-50 rounded-lg transition-colors">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
                     </div>
                 </div>
                 {% else %}
-                <a href="{% url 'login' %}" class="flex items-center gap-2 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full text-sm font-bold transition-all shadow-md hover:shadow-lg active:scale-95">
-                    <i class="bi bi-person-circle"></i> <span>Login</span>
+                <a href="{% url 'login' %}" class="hidden sm:flex items-center gap-2 px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-full text-xs font-black transition-all shadow-md active:scale-95">
+                    <i class="bi bi-person-circle"></i> LOGIN
+                </a>
+                <a href="{% url 'login' %}" class="sm:hidden p-2 text-amber-900/80">
+                    <i class="bi bi-person-circle text-xl"></i>
                 </a>
                 {% endif %}
             </div>
+
+            <button type="button" id="hamburger-btn" class="sm:hidden p-2 text-amber-900/80 hover:bg-amber-50 rounded-xl transition-all">
+                <i class="bi bi-list text-2xl" id="hamburger-icon"></i>
+            </button>
         </div>
     </nav>
+
+    <div id="mobile-menu" class="hidden sm:hidden bg-white border-b border-amber-100 shadow-2xl transition-all">
+        <div class="px-4 py-6 space-y-2">
+            <a href="{% url 'product-list' %}" class="flex items-center gap-3 px-4 py-3 text-amber-900 font-black text-sm hover:bg-amber-50 rounded-2xl transition-colors">
+                <i class="bi bi-shop text-amber-600"></i> SHOP
+            </a>
+            <a href="{% url 'contact-us' %}" class="flex items-center gap-3 px-4 py-3 text-amber-900 font-black text-sm hover:bg-amber-50 rounded-2xl transition-colors">
+                <i class="bi bi-chat-dots text-amber-600"></i> CONTACT
+            </a>
+            <a href="{% url 'about-us' %}" class="flex items-center gap-3 px-4 py-3 text-amber-900 font-black text-sm hover:bg-amber-50 rounded-2xl transition-colors">
+                <i class="bi bi-info-circle text-amber-600"></i> OUR STORY
+            </a>
+        </div>
+    </div>
 </header>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. Gestion du Menu Mobile (Hamburger)
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const hamburgerIcon = document.getElementById('hamburger-icon');
+
+    if (hamburgerBtn) {
+        hamburgerBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+            const isHidden = mobileMenu.classList.contains('hidden');
+            hamburgerIcon.classList.replace(isHidden ? 'bi-x-lg' : 'bi-list', isHidden ? 'bi-list' : 'bi-x-lg');
+        });
+    }
+
+    /*/ 2. Gestion du Dropdown Profil
+    const profileIcon = document.getElementById('profile-icon');
+    const profileMenu = document.getElementById('profile-menu');
+
+    if (profileIcon) {
+        profileIcon.addEventListener('click', (e) => {
+            e.stopPropagation();
+            profileMenu.classList.toggle('hidden');
+        });
+
+        // Fermer le menu si on clique ailleurs sur la page
+        document.addEventListener('click', (e) => {
+            if (profileMenu && !profileMenu.contains(e.target)) {
+                profileMenu.classList.add('hidden');
+            }
+        });
+    }*/
+});
+</script>

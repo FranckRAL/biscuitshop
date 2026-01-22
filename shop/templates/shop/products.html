@@ -1,6 +1,7 @@
 {% extends "shop/main.html" %}
 {% load static %}
 {% load cloudinary %}
+{% load cloudinary_filters %}
 {% block title %}Our Shop - Biscuit'tsika{% endblock %}
 
 {% block content %}
@@ -8,7 +9,7 @@
         {% csrf_token %}
     </div>
 
-    <dialog class="product-details-modal rounded-[2.5rem] border-none shadow-2xl p-0 overflow-hidden" id="product-details-modal">
+    <dialog class="product-details-modal rounded-[2.5rem] border-none shadow-2xl p-0 w-full md:max-w-[80vw] overflow-hidden" id="product-details-modal">
         <div class="relative">
             <button id="close-modal" class="absolute top-4 right-4 z-50 bg-white/80 backdrop-blur-sm p-2 rounded-full hover:bg-amber-100 transition-colors" aria-label="Close">
                 <i class="bi bi-x-lg text-xl text-amber-900"></i>
@@ -44,11 +45,11 @@
         <div class="mb-12">
             <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 sm:gap-8" role="list">
                 {% for product in products %}
-                    <li class="group bg-white rounded-[2rem] border border-amber-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col" data-detail-url="{% url 'product-detail' product.id %}">
+                    <li class="product-card group bg-white rounded-[2rem] border border-amber-100 shadow-sm hover:shadow-2xl transition-all duration-500 overflow-hidden flex flex-col" data-detail-url="{% url 'product-detail' product.id %}">
                         
                         <div class="relative overflow-hidden aspect-square bg-amber-50">
-                            <img src="{{product.image.url}}" alt="{{product.name}}" 
-                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110" 
+                            <img src="{{product.image.url|optimize_biscuits}}" alt="{{product.name}}" 
+                                 class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110 cursor-pointer" 
                                  loading="lazy" />
                             
                             <button class="favorite-btn absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2.5 rounded-full shadow-md hover:bg-amber-500 hover:text-white transition-all active:scale-90"
@@ -64,7 +65,7 @@
                         </div>
 
                         <div class="p-6 flex flex-col flex-grow">
-                            <h2 class="text-xl font-bold text-amber-900 mb-2 group-hover:text-amber-600 transition-colors quicksand-bold">
+                            <h2 class="text-xl font-bold text-amber-900 mb-2 group-hover:text-amber-600 transition-colors quicksand-bold cursor-pointer">
                                 {{ product.name }}
                             </h2>
                             <p class="text-amber-800/60 text-sm mb-4 line-clamp-2 flex-grow italic">

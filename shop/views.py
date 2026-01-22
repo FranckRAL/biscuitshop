@@ -29,10 +29,10 @@ def home(request):
     return render(request, 'shop/home.html', context)
 
 def about_us(request):
-    return render(request, 'shop/about.html')
+    return render(request, 'shop/about.html', {'page': 'about'})
 
 def contact_us(request):
-    return render(request, 'shop/contact.html')
+    return render(request, 'shop/contact.html', {'page': 'contact'})
 
 
 #Authentication views
@@ -123,7 +123,8 @@ def products_list_view(request):
     context = {
         'products': products_page.get_page(page_number),
         'categories': categories,
-        'current_category': current_category
+        'current_category': current_category,
+        'page': 'shop'
     }
     return render(request, 'shop/products.html', context)
 

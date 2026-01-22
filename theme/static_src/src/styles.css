@@ -118,9 +118,6 @@
     @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6;
   }
 
-  .product-card {
-    @apply border border-gray-300 rounded shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105 h-full flex flex-col;
-  }
 
   .product-card-img {
     @apply w-full h-48 object-cover rounded-t cursor-pointer;

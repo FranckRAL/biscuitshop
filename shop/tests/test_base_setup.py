@@ -1,11 +1,12 @@
 from django.test import TestCase
 from django.urls import reverse
-from shop.models import Category, Product, Order
 from decimal import Decimal
-from django.contrib.auth.models import User
+
 
 class ShopTestBase(TestCase):
     def setUp(self):
+        from shop.models import Category, Product
+        from django.contrib.auth.models import User
         self.raw_pasword = 'Activation6421'
         self.username = 'tester'
         self.user = User.objects.create_user(username='tester', password=self.raw_pasword)

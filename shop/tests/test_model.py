@@ -1,8 +1,6 @@
 from django.forms import ValidationError
-from django.test import TestCase
 from django.urls import reverse
-from shop.models import Product, Category, WishlistItem, Order, OrderItem, CartItem
-from django.contrib.auth.models import User
+
 from django.db.utils import IntegrityError
 from shop.tests.test_base_setup import ShopTestBase
 
@@ -39,9 +37,11 @@ class ProductModelTest(ShopTestBase):
         self.assertEqual(url, expected_url)
         
 class ShoppingModelsTest(ShopTestBase):
-
+    
+    
     def test_cart_item_uniqueness(self):
         """Vérifie qu'on ne peut pas avoir deux entrées pour le même couple user/produit"""
+        from shop.models import CartItem
         CartItem.objects.create(user=self.user, product=self.product, quantity=1)
         
         with self.assertRaises(IntegrityError):
@@ -50,33 +50,36 @@ class ShoppingModelsTest(ShopTestBase):
 
     def test_wishlist_item_uniqueness(self):
         """Vérifie l'unicité dans la liste de souhaits"""
+        from shop.models import WishlistItem
         WishlistItem.objects.create(user=self.user, product=self.product)
         
         with self.assertRaises(IntegrityError):
             WishlistItem.objects.create(user=self.user, product=self.product)
             
     def test_order_creation_with_items(self):
-            order = Order.objects.create(
-                user=self.user,
-                total_price=15.00,
-                status='pending',
-                customer_phone="0102030405"
-            )
-            
-            order_item = OrderItem.objects.create(
-                order=order,
-                product=self.product,
-                quantity=3,
-                price=self.product.price
-            )
-            
-            # Check that order and order item are created correctly and the related name items works
-            self.assertEqual(order.items.count(), 1) # type: ignore
-            self.assertEqual(order.items.first().product.name, 'Petit Beurre') #type: ignore
-            self.assertEqual(str(order), f"Order of {self.user}")
+        from shop.models import Order, OrderItem
+        order = Order.objects.create(
+            user=self.user,
+            total_price=15.00,
+            status='pending',
+            customer_phone="0102030405"
+        )
+        
+        order_item = OrderItem.objects.create(
+            order=order,
+            product=self.product,
+            quantity=3,
+            price=self.product.price
+        )
+        
+        # Check that order and order item are created correctly and the related name items works
+        self.assertEqual(order.items.count(), 1) # type: ignore
+        self.assertEqual(order.items.first().product.name, 'Petit Beurre') #type: ignore
+        self.assertEqual(str(order), f"Order of {self.user}")
             
     def test_order_item_price_persistence(self):
         # product created with initial price
+        from shop.models import Product, Order, OrderItem
         product = Product.objects.create(name='Biscuits Vanille', price=2.50, stock=10, category=self.category)
         
         # order created with that product

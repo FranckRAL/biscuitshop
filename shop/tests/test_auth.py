@@ -1,7 +1,6 @@
 from django.test import TestCase
 from django.urls import reverse
-from shop.models import CustomerProfile 
-from django.contrib.auth.models import User 
+ 
 
 
 class AuthTest(TestCase):
@@ -25,6 +24,9 @@ class AuthTest(TestCase):
     def test_customer_profile_created_with_user(self):
         """Test that a CustomerProfile is created when a new user registers
         """
+        from shop.models import CustomerProfile 
+        from django.contrib.auth.models import User
+        
         user = User.objects.create_user(
             username='biscuit_lover',
             password='Activation6421',
@@ -45,6 +47,7 @@ class AuthTest(TestCase):
 
 class AdminSecurityTests(TestCase):
     def setUp(self):
+        from django.contrib.auth.models import User
         self.client_user = User.objects.create_user(username='client', password='Activation6421')
         self.staff_user = User.objects.create_user(username='admin_staff', password='Activation6421', is_staff=True)
 

@@ -1,6 +1,6 @@
 from django.urls import reverse
 from decimal import Decimal
-from shop.models import Order
+
 from unittest.mock import patch
 import json
 from shop.tests.test_base_setup import ShopTestBase
@@ -15,14 +15,10 @@ class CheckoutViewTests(ShopTestBase):
         session['cart'] = self.cart_data
         session.save()
         
-        # self.order = Order.objects.create(
-        #     user=self.user, total_price=10000, status="pending"
-        # )
-        
-        # order_item = OrderItem.objects.create(order=self.order, product=self.product, quantity=1, price=self.product.price)
 
 
     def test_checkout_creates_order_and_items(self):
+        from shop.models import Order
         response = self.client.post(
             reverse("checkout"),
             {
@@ -39,6 +35,7 @@ class CheckoutViewTests(ShopTestBase):
 
     @patch("shop.payment.mvola_service.MvolaPaymentService.initiate_payment")
     def test_process_payment_mvola_redirection(self, mock_initiate):
+        from shop.models import Order
         order = Order.objects.create(
             user=self.user, total_price=10000, payment_method="mvola"
         )
@@ -52,6 +49,7 @@ class CheckoutViewTests(ShopTestBase):
         self.assertTrue(mock_initiate.called)
 
     def test_mvola_callback_updates_order_status(self):
+        from shop.models import Order
         order = Order.objects.create(
             user=self.user,
             total_price=10000,
@@ -82,6 +80,7 @@ class CheckoutViewTests(ShopTestBase):
 class PaymentAjaxTests(ShopTestBase):
     def setUp(self):
         super().setUp()
+        from shop.models import Order
         self.client.login(username=self.user.username, password=self.raw_pasword)
         self.order = Order.objects.create(
             user=self.user,

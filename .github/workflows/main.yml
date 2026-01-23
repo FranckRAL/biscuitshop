@@ -31,7 +31,7 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SANDBOX_MVOLA_CLIENT_ID: ${{ secrets.MVOLA_CLIENT_ID }}
-          SANDBOX_MVOLA_CLIENT_SECRET: ${{ secrets.MVOLA_CLIENT_SECRET }}
+          SANDBOX_MVOLA_SECRET_KEY: ${{ secrets.MVOLA_SECRET_KEY }}
           CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}

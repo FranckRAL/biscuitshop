@@ -128,23 +128,14 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASE_URL = env('DATABASE_URL', default='sqlite:///db.sqlite3') #type: ignore
-
 DATABASES = {
     'default': dj_database_url.config(
-        default=DATABASE_URL,
+        default= env('DATABASE_URL'),
         conn_max_age=0,
-        ssl_require=True if DATABASE_URL and "sqlite" not in DATABASE_URL else False
+        ssl_require=True 
     )
 }
 
-# 2. SECOURS : Si dj_database_url n'a rien configuré (cas de GitHub Actions), 
-# on force SQLite pour que les tests puissent tourner.
-if not DATABASES['default'] or 'ENGINE' not in DATABASES['default']:
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
 
 
 # Password validation

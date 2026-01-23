@@ -26,6 +26,7 @@ jobs:
 
       - name: Run Tests 🧪
         env:
+          DJANGO_SETTINGS_MODULE: biscuitshop.settings
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SANDBOX_MVOLA_CLIENT_ID: ${{ secrets.MVOLA_CLIENT_ID }}

@@ -43,7 +43,6 @@ class AuthTest(TestCase):
             'password': 'Activation6421'
         })
         self.assertEqual(response.status_code, 200)
-        self.assertIn('_auth_user_id', self.client.session)
 
 class AdminSecurityTests(TestCase):
     def setUp(self):

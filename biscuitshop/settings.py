@@ -1,4 +1,4 @@
-
+import sys
 from pathlib import Path
 import environ
 import cloudinary
@@ -137,6 +137,7 @@ DATABASES = {
         ssl_require=True 
     )
 }
+
 
 if 'test' in sys.argv:
     DATABASES['default'] = {

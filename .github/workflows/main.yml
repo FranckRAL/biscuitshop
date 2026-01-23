@@ -46,4 +46,4 @@ jobs:
           MVOLA_API_SCOPE: ${{vars.MVOLA_API_SCOPE}}
 
         run: |
-          python manage.py test
+          python manage.py test --noinput

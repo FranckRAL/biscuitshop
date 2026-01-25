@@ -134,20 +134,22 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
+db_url = env('DATABASE_URL', default=None)
+
 DATABASES = {
     'default': dj_database_url.config(
-        default= env('DATABASE_URL'),                           #type: ignore 
-        conn_max_age=0,
-        ssl_require=True 
+        default=db_url,
+        conn_max_age=600,
+        ssl_require=True if db_url else False
     )
 }
 
-if 'test' in sys.argv:
-    DATABASES['default'] = {                                    #type: ignore
+# Cette condition est VITALE pour GitHub Actions
+if 'test' in sys.argv or not DATABASES['default'].get('ENGINE'):
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

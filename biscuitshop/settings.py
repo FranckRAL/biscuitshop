@@ -122,8 +122,8 @@ cloudinary.config(
     api_secret=CLOUDINARY_STORAGE['API_SECRET'],
 )
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
@@ -199,8 +199,8 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        # "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -228,11 +228,12 @@ MVOLA_PARTNER_MSISDN = env('SANDBOX_MVOLA_PARTNER_MSISDN') if ENV_MODE == 'sandb
 MVOLA_PARTNER_NAME = env('MVOLA_PARTNER_NAME')
 MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_ACCESS_TOKEN_ENDPOINT')
 MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
-MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='EXT_INT_MVOLA_SCOPE') #type: ignore
+# Mvola API scopes - request the correct scope for merchant pay operations
+MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay') #type: ignore
 
 
 
 #django security
 SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False
+CSRF_COOKIE_SECURE = False

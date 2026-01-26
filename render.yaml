@@ -45,9 +45,9 @@ services:
         sync: false
       - key: MVOLA_API_SCOPE
         value: "EXT_INT_MVOLA_SCOPE"
-      - key: "CSRF_COOKIE_SECURE":
+      - key: "CSRF_COOKIE_SECURE"
         value: "True"
-      - key: "SESSION_COOKIE_SECURE":
+      - key: "SESSION_COOKIE_SECURE"
         value: "True"
-      - key: "SECURE_SSL_REDIRECT":
+      - key: "SECURE_SSL_REDIRECT"
         value: "True"

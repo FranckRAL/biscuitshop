@@ -22,10 +22,10 @@ DEBUG = env.bool('DEBUG', default=False) #type: ignore
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost']) #type: ignore
 
-RENDER_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME')
+# RENDER_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME')
 
-if RENDER_HOSTNAME:
-    ALLOWED_HOSTS.append(RENDER_HOSTNAME) #type: ignore
+# if RENDER_HOSTNAME:
+#     ALLOWED_HOSTS.append(RENDER_HOSTNAME) #type: ignore
 
 # Application definition
 
@@ -122,8 +122,8 @@ cloudinary.config(
     api_secret=CLOUDINARY_STORAGE['API_SECRET'],
 )
 
-# STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+# STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 
@@ -134,18 +134,16 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
-db_url = env('DATABASE_URL', default=None)
-
 DATABASES = {
     'default': dj_database_url.config(
-        default=db_url,
+        default=env('DATABASE_URL'),
         conn_max_age=600,
-        ssl_require=True if db_url else False
+        ssl_require=True
     )
 }
 
-# Cette condition est VITALE pour GitHub Actions
-if 'test' in sys.argv or not DATABASES['default'].get('ENGINE'):
+
+if 'test' in sys.argv:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
@@ -199,8 +197,8 @@ STORAGES = {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        # "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
 
@@ -228,12 +226,11 @@ MVOLA_PARTNER_MSISDN = env('SANDBOX_MVOLA_PARTNER_MSISDN') if ENV_MODE == 'sandb
 MVOLA_PARTNER_NAME = env('MVOLA_PARTNER_NAME')
 MVOLA_ACCESS_TOKEN_ENDPOINT = env('SANDBOX_MVOLA_ACCESS_TOKEN_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_ACCESS_TOKEN_ENDPOINT')
 MVOLA_REVOKE_ENDPOINT = env('SANDBOX_MVOLA_REVOKE_ENDPOINT') if ENV_MODE == 'sandbox' else env('PRODUCTION_MVOLA_REVOKE_ENDPOINT')
-# Mvola API scopes - request the correct scope for merchant pay operations
-MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='merchantpay') #type: ignore
+MVOLA_API_SCOPE = env('MVOLA_API_SCOPE', default='EXT_INT_MVOLA_SCOPE') #type: ignore
 
 
 
 #django security
-SECURE_SSL_REDIRECT = False
-SESSION_COOKIE_SECURE = False
-CSRF_COOKIE_SECURE = False
+SECURE_SSL_REDIRECT = env.bool('SECURE_SSL_REDIRECT', default=False)
+SESSION_COOKIE_SECURE = env.bool('SESSION_COOKIE_SECURE', default=False)
+CSRF_COOKIE_SECURE = env.bool('CSRF_COOKIE_SECURE', default=False)

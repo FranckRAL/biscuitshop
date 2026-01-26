@@ -22,6 +22,11 @@ DEBUG = env.bool('DEBUG', default=False) #type: ignore
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost']) #type: ignore
 
+RENDER_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME')
+
+if RENDER_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_HOSTNAME) #type: ignore
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -129,23 +134,22 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
+db_url = env('DATABASE_URL', default=None)
 
 DATABASES = {
     'default': dj_database_url.config(
-        default= env('DATABASE_URL'),
-        conn_max_age=0,
-        ssl_require=True 
+        default=db_url,
+        conn_max_age=600,
+        ssl_require=True if db_url else False
     )
 }
 
-
-if 'test' in sys.argv:
+# Cette condition est VITALE pour GitHub Actions
+if 'test' in sys.argv or not DATABASES['default'].get('ENGINE'):
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
-
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -184,6 +188,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'shop/static']
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'

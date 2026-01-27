@@ -22,10 +22,6 @@ DEBUG = env.bool('DEBUG', default=False) #type: ignore
 
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['127.0.0.1', 'localhost']) #type: ignore
 
-# RENDER_HOSTNAME = env('RENDER_EXTERNAL_HOSTNAME')
-
-# if RENDER_HOSTNAME:
-#     ALLOWED_HOSTS.append(RENDER_HOSTNAME) #type: ignore
 
 # Application definition
 
@@ -134,12 +130,19 @@ WSGI_APPLICATION = 'biscuitshop.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 
+# DATABASES = {
+#     'default': dj_database_url.config(
+#         default=env('DATABASE_URL'),
+#         conn_max_age=600,
+#         ssl_require=True
+#     )
+# }
+
 DATABASES = {
-    'default': dj_database_url.config(
-        default=env('DATABASE_URL'),
-        conn_max_age=600,
-        ssl_require=True
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 }
 
 

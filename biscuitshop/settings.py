@@ -214,6 +214,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Tailwind CSS Configuration
 TAILWIND_APP_NAME = 'theme'
 
+INTERNAL_IPS = [
+    "127.0.0.1",
+]
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.db"
 SESSION_COOKIE_AGE = 1209600                            # 2 weeks in seconds
